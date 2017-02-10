@@ -19,4 +19,8 @@
 		赫拉，业务功能代码生成器
 	</description>
 	
+	<modules>
+		<module>hera-web</module>
+		<module>hera-service</module>
+	</modules>
 </project>

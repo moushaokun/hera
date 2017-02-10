@@ -1,2 +1,12 @@
 /.project
 /.settings
+/hera-web/.project
+/hera-web/.settings
+/hera-web/data
+/hera-web/logs
+/hera-web/target
+/hera-web/.classpath
+/hera-service/.project
+/hera-service/.settings
+/hera-service/target
+/hera-service/.classpath
