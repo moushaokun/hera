@@ -1,0 +1,30 @@
+body {
+		margin: 0px;
+}
+
+.magin-top50:{
+	margin-top:50px;
+}
+
+.magin-top15:{
+	margin-top:15px;
+}
+
+.main_content .magin-top50{
+	margin-top:50px;
+}
+
+.main_content .magin-top15{
+	margin-top:15px;
+}
+
+.ad_logo{
+	width:400px;
+	height:320px;
+}
+
+.main_content{
+	width:80%;
+	margin:auto;
+	margin-top:130px;
+}

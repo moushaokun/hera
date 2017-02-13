@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>代码机器人</title>
+${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnotify}
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/css/index.css" >
+<script type="text/javascript" src="${request.contextPath}/js/index.js"></script>
+</head>
+<body>
+	<div id="app">
+		<nav class="navbar navbar-default navbar-fixed-top">
+			<div class="container-fluid">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Code Robot</a>
+				</div>
+
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse"
+					id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="#">工程管理</a></li>
+						<li><a href="#">常规模块管理</a></li>
+					</ul>
+				</div>
+				<!-- /.navbar-collapse -->
+			</div>
+			<!-- /.container-fluid -->
+		</nav>
+		
+		<div class="main_content">
+			<el-row :gutter="200">
+				<el-col :span="8">
+					<img class="ad_logo" src="${request.contextPath}/images/robot.jpg">							
+				</el-col>
+				<el-col :span="14">
+					<div>
+						<div class="page-header">
+						  <h3>代码机器人<small>极速产生Java EE功能代码</small></h3>
+						</div>
+					</div>
+					<div>
+						<el-row :gutter="50">
+							<el-col :span="12">
+								<div class="magin-top15">
+									<el-tooltip class="item" effect="dark" content="产生云控制台样式的前后台代码" placement="top">
+										<button type="button" class="btn btn-success btn-lg">云控制台脚手架下载</button>
+									</el-tooltip>
+								</div>
+								<div class="magin-top50">
+									<el-tooltip class="item" effect="dark" content="产生数据库连接配置文件" placement="top">
+										<button @click="dbDialogShow = true" type="button" class="btn btn-info btn-lg">数据库配置文件下载</button>
+									</el-tooltip>
+								</div>
+							</el-col>
+							
+							<el-col :span="12">
+								<div class="magin-top15">
+									<el-tooltip class="item" effect="dark" content="产生spring-boot的application.properties配置文件模板" placement="top">
+										<button @click="downloadBootConfig" type="button" class="btn btn-warning btn-lg">Spring-boot属性配置下载</button>
+									</el-tooltip>
+								</div>
+								<div class="magin-top50">
+									<el-tooltip class="item" effect="dark" content="产生maven全局配置文件" placement="top">
+										<button @click="settingsDialogShow = true" type="button" class="btn btn-danger btn-lg">Maven-settings文件下载</button>
+									</el-tooltip>
+								</div>
+							</el-col>
+						</el-row>
+					</div>
+				</el-col>
+			</el-row>
+		</div>
+		
+		<!-- settings dialog -->
+		<el-dialog title="settings文件参数" v-model="settingsDialogShow" size="large" lock-scroll @close="resetSettingsDialog">
+			<el-form ref="settingsParamsForm" :rules="settingsFormRules" :model="settingsParams" label-width="180px">
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="仓库地址" prop="repositoryLocation"> 
+							<el-input v-model="settingsParams.repositoryLocation" size="small" placeholder="请输入本地仓库地址"></el-input>
+						</el-form-item>
+					</el-col>
+					
+					<el-col :span="12">
+						<el-form-item label="jdk版本" prop="jdkVersion"> 
+							<el-input v-model="settingsParams.jdkVersion" size="small" placeholder="请输入jdk版本:1.6/1.7/1.8/1.9"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="nexus账户" prop="nexusUsername"> 
+							<el-input v-model="settingsParams.nexusUser" size="small" placeholder="请输入nexus账户"></el-input>
+						</el-form-item>
+					</el-col>
+					
+					<el-col :span="12">
+						<el-form-item label="nexus密码" prop="nexusPassword"> 
+							<el-input v-model="settingsParams.nexusPassword" size="small" placeholder="请输入nexus密码"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="nexus Release地址" prop="nexusReleaseAddress"> 
+							<el-input v-model="settingsParams.nexusReleaseAddress" size="small" placeholder="请输入nexus Release地址"></el-input>
+						</el-form-item>
+					</el-col>
+					
+					<el-col :span="12">
+						<el-form-item label="nexus snapshot地址" prop="nexusSnapshotAddress"> 
+							<el-input v-model="settingsParams.nexusSnapshotAddress" size="small" placeholder="请输入nexus snapshot地址"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button size="small" @click="resetSettingsDialog">取 消</el-button>
+				<el-button type="primary" @click="downloadMvnSettings" size="small" >下载</el-button>
+			</div>
+		</el-dialog>
+		
+		<!-- db dialog -->
+		<el-dialog title="db连接文件参数" v-model="dbDialogShow" size="large" lock-scroll>
+			<el-form ref="dbParamsForm" :rules="dbFormRules" :model="dbParams" label-width="80px">
+				<el-row>
+					<el-col :span="6">
+						<el-form-item label="数据库"> 
+							<el-select v-model="dbType" placeholder="请选择">
+							    <el-option
+							      v-for="item in dbTypes"
+							      :label="item"
+							      :value="item">
+							    </el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="6">
+						<el-form-item label="URL" prop="url"> 
+							<el-input v-model="dbParams.url" size="small" placeholder="请输入连接URL"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="6">
+						<el-form-item label="驱动" prop="driverClass"> 
+							<el-input v-model="dbParams.driverClass" size="small" placeholder="请输入driverClass"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="6">
+						<el-form-item label="用户名" prop="username"> 
+							<el-input v-model="dbParams.username" size="small" placeholder="请输入连接用户名"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="6">
+						<el-form-item label="密码" prop="password"> 
+							<el-input v-model="dbParams.password" size="small" placeholder="请输入连接密码"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="nexus账户" prop="nexusUsername"> 
+							<el-input v-model="settingsParams.nexusUser" size="small" placeholder="请输入nexus账户"></el-input>
+						</el-form-item>
+					</el-col>
+					
+					<el-col :span="12">
+						<el-form-item label="nexus密码" prop="nexusPassword"> 
+							<el-input v-model="settingsParams.nexusPassword" size="small" placeholder="请输入nexus密码"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="nexus Release地址" prop="nexusReleaseAddress"> 
+							<el-input v-model="settingsParams.nexusReleaseAddress" size="small" placeholder="请输入nexus Release地址"></el-input>
+						</el-form-item>
+					</el-col>
+					
+					<el-col :span="12">
+						<el-form-item label="nexus snapshot地址" prop="nexusSnapshotAddress"> 
+							<el-input v-model="settingsParams.nexusSnapshotAddress" size="small" placeholder="请输入nexus snapshot地址"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button size="small" @click="resetSettingsDialog">取 消</el-button>
+				<el-button type="primary" @click="downloadMvnSettings" size="small" >下载</el-button>
+			</div>
+		</el-dialog>
+		
+	</div>
+</body>
+</html>
