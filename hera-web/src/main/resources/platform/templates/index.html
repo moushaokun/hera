@@ -127,12 +127,12 @@ ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnoti
 		</el-dialog>
 		
 		<!-- db dialog -->
-		<el-dialog title="db连接文件参数" v-model="dbDialogShow" size="large" lock-scroll>
+		<el-dialog title="db连接文件参数" v-model="dbDialogShow" size="large" lock-scroll @close="resetDbDialog">
 			<el-form ref="dbParamsForm" :rules="dbFormRules" :model="dbParams" label-width="80px">
 				<el-row>
 					<el-col :span="6">
 						<el-form-item label="数据库"> 
-							<el-select v-model="dbType" placeholder="请选择">
+							<el-select v-model="dbType" placeholder="请选择" @change="changeDbType">
 							    <el-option
 							      v-for="item in dbTypes"
 							      :label="item"
@@ -142,60 +142,129 @@ ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnoti
 						</el-form-item>
 					</el-col>
 				</el-row>
+				
 				<el-row>
-					<el-col :span="6">
+					<el-col :span="12">
 						<el-form-item label="URL" prop="url"> 
 							<el-input v-model="dbParams.url" size="small" placeholder="请输入连接URL"></el-input>
 						</el-form-item>
 					</el-col>
-					<el-col :span="6">
+					<el-col :span="12">
+						<el-form-item label="XA数据源" prop="xaDsClassName"> 
+							<el-input v-model="dbParams.xaDsClassName" size="small" placeholder="请输入XA数据源"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				
+				<el-row>
+					<el-col :span="8">
 						<el-form-item label="驱动" prop="driverClass"> 
 							<el-input v-model="dbParams.driverClass" size="small" placeholder="请输入driverClass"></el-input>
 						</el-form-item>
 					</el-col>
-					<el-col :span="6">
+					<el-col :span="8">
 						<el-form-item label="用户名" prop="username"> 
 							<el-input v-model="dbParams.username" size="small" placeholder="请输入连接用户名"></el-input>
 						</el-form-item>
 					</el-col>
-					<el-col :span="6">
-						<el-form-item label="密码" prop="password"> 
+					<el-col :span="8">
+						<el-form-item label="密码"> 
 							<el-input v-model="dbParams.password" size="small" placeholder="请输入连接密码"></el-input>
 						</el-form-item>
 					</el-col>
 				</el-row>
 				
 				<el-row>
-					<el-col :span="12">
-						<el-form-item label="nexus账户" prop="nexusUsername"> 
-							<el-input v-model="settingsParams.nexusUser" size="small" placeholder="请输入nexus账户"></el-input>
+					<el-col :span="6">
+						<el-form-item label="池初始值" > 
+							<el-input v-model="dbParams.initialSize" size="small" placeholder="请输入数据池初始值"></el-input>
 						</el-form-item>
 					</el-col>
-					
-					<el-col :span="12">
-						<el-form-item label="nexus密码" prop="nexusPassword"> 
-							<el-input v-model="settingsParams.nexusPassword" size="small" placeholder="请输入nexus密码"></el-input>
+					<el-col :span="6">
+						<el-form-item label="最小Idle数"> 
+							<el-input v-model="dbParams.minIdle" size="small" placeholder="请输入池最小idle"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="6">
+						<el-form-item label="最大活跃数"> 
+							<el-input v-model="dbParams.maxActive" size="small" placeholder="请输入池maxActive"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="6">
+						<el-form-item label="最大wait数"> 
+							<el-input v-model="dbParams.maxWait" size="small" placeholder="请输入池maxWait"></el-input>
 						</el-form-item>
 					</el-col>
 				</el-row>
 				
 				<el-row>
-					<el-col :span="12">
-						<el-form-item label="nexus Release地址" prop="nexusReleaseAddress"> 
-							<el-input v-model="settingsParams.nexusReleaseAddress" size="small" placeholder="请输入nexus Release地址"></el-input>
+					<el-col :span="6">
+						<el-form-item label="检测间隔" > 
+							<el-input v-model="dbParams.timeBetweenEvictionRunsMillis" size="small" placeholder="请输入检测的间隔时间/毫秒"></el-input>
 						</el-form-item>
 					</el-col>
-					
+					<el-col :span="6">
+						<el-form-item label="生存时间(min)"> 
+							<el-input v-model="dbParams.minEvictableIdleTimeMillis" size="small" placeholder="请输入连接的最小生存时间"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="6">
+						<el-form-item label="检测语句"> 
+							<el-input v-model="dbParams.validationQuery" size="small" placeholder="请输入检测语句/select 'x'"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="6">
+						<el-form-item label="方言"> 
+							<el-input v-model="dbParams.dialect" size="small" placeholder="请输入数据库的方言/mysql"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				
+				<el-row>
+					<el-col :span="6">
+						<el-form-item label="空闲时检测" > 
+							<el-switch
+							  v-model="dbParams.testWhileIdle"
+							  on-text="开"
+							  off-text="关">
+						</el-form-item>
+					</el-col>
+					<el-col :span="6">
+						<el-form-item label="借入时检测" > 
+							<el-switch
+							  v-model="dbParams.testOnBorrow"
+							  on-text="开"
+							  off-text="关">
+						</el-form-item>
+					</el-col>
+					<el-col :span="6">
+						<el-form-item label="返回时检测" > 
+							<el-switch
+							  v-model="dbParams.testOnReturn"
+							  on-text="开"
+							  off-text="关">
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="6">
+						<el-form-item label="psCache" > 
+							<el-switch
+							  v-model="dbParams.poolPreparedStatements"
+							  on-text="开"
+							  off-text="关">
+						</el-form-item>
+					</el-col>
 					<el-col :span="12">
-						<el-form-item label="nexus snapshot地址" prop="nexusSnapshotAddress"> 
-							<el-input v-model="settingsParams.nexusSnapshotAddress" size="small" placeholder="请输入nexus snapshot地址"></el-input>
+						<el-form-item label="cache数"> 
+							<el-input v-bind:disabled="!dbParams.poolPreparedStatements" v-model="dbParams.maxPoolPreparedStatementPerConnectionSize" size="small" placeholder="请输入psCache值"></el-input>
 						</el-form-item>
 					</el-col>
 				</el-row>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-				<el-button size="small" @click="resetSettingsDialog">取 消</el-button>
-				<el-button type="primary" @click="downloadMvnSettings" size="small" >下载</el-button>
+				<el-button size="small" @click="resetDbDialog">取 消</el-button>
+				<el-button type="primary" @click="downloadDbConfig" size="small" >下载</el-button>
 			</div>
 		</el-dialog>
 		

@@ -1,6 +1,13 @@
 
 var vue;
 
+var dbTypeMap = PlatformUI.arrayMap();
+dbTypeMap.put("oracle", ["oracle.jdbc.OracleDriver", "oracle.jdbc.xa.client.OracleXADataSource", "jdbc:oracle:thin:@[ip]:[1521]:[schema]"]);
+dbTypeMap.put("mysql", ["com.mysql.jdbc.Driver", "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource", "jdbc:mysql://[ip]:[3306]/[schema]?useUnicode=true&characterEncoding=utf8&pinGlobalTxToPhysicalConnection=true"]);
+dbTypeMap.put("sqlserver", ["com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.microsoft.sqlserver.jdbc.SQLServerXADataSource", "jdbc:sqlserver://[ip]:[1433];databaseName=yzpt"]);
+dbTypeMap.put("h2", ["org.h2.Driver", "org.h2.jdbcx.JdbcDataSource", "jdbc:h2:F://data//yzpt"]);
+dbTypeMap.put("dm", ["dm.jdbc.driver.DmDriver", "dm.jdbc.xa.DmdbXADataSource", "jdbc:dm://[ip]:[5236]"]);
+
 $(function(){
 
 	vue = new Vue({
@@ -47,6 +54,15 @@ $(function(){
 		        dbFormRules: {
 		          url: [
 		            { required: true, message: '请输入url', trigger: 'change' }
+		          ],
+		          driverClass: [
+		            { required: true, message: '请输入驱动', trigger: 'change' }
+		          ],
+		          username: [
+		            { required: true, message: '请输入用户名', trigger: 'change' }
+		          ],
+		          xaDsClassName: [
+		            { required: true, message: '请输入XA数据源', trigger: 'change' }
 		          ]
 		        }
 			};
@@ -55,16 +71,8 @@ $(function(){
 			downloadMvnSettings: function(){//下载maven  settins文件
 				var context = this;
         		this.$refs['settingsParamsForm'].validate(function(valid){
-        			var params = {
-        				repositoryLocation: context.settingsParams.repositoryLocation,
-						nexusUser: context.settingsParams.nexusUser,
-						nexusPassword: context.settingsParams.nexusPassword,
-						nexusReleaseAddress: context.settingsParams.nexusReleaseAddress,
-						nexusSnapshotAddress: context.settingsParams.nexusSnapshotAddress,
-						jdkVersion: context.settingsParams.jdkVersion
-        			};
         			if (valid) {
-        				PlatformUI.simulateSubmitForm(contextPath + "/downloadMvnSettings", params, "post");
+        				PlatformUI.simulateSubmitForm(contextPath + "/downloadMvnSettings", context.settingsParams, "post");
 			            context.settingsDialogShow = false;
 						context.$refs['settingsParamsForm'].resetFields();
 			        } else {
@@ -90,6 +98,49 @@ $(function(){
 			},
 			downloadBootConfig: function(){//下载spring boot配置文件信息
 				PlatformUI.simulateSubmitForm(contextPath + "/downloadBootConfig", null, "post");
+			},
+			downloadDbConfig: function(){//下载db配置文件信息
+				var context = this;
+        		this.$refs['dbParamsForm'].validate(function(valid){
+        			console.log(context.dbParams);
+        			if (valid) {
+        				PlatformUI.simulateSubmitForm(contextPath + "/downloadDBConfig", context.dbParams, "post");
+			            context.dbDialogShow = false;
+						context.$refs['dbParamsForm'].resetFields();
+			        } else {
+			            PlatformUI.message({message:"表单验证失败", type:"error"});
+			            return false;
+			        }
+        		});
+			},
+			resetDbDialog: function(){
+				this.dbDialogShow = false;
+				this.$refs['dbParamsForm'].resetFields();
+				this.dbParams = {
+					url: null,
+					driverClass: null,
+					username: null,
+					password: null,
+					xaDsClassName: null,
+					initialSize: null,
+					minIdle: null,
+					maxActive: null,
+					maxWait: null,
+					timeBetweenEvictionRunsMillis: null,
+					minEvictableIdleTimeMillis: null,
+					validationQuery: null,
+					testWhileIdle: null,
+					testOnBorrow: null,
+					testOnReturn: null,
+					poolPreparedStatements: null,
+					maxPoolPreparedStatementPerConnectionSize: null,
+					dialect: null
+				};
+			},
+			changeDbType: function(data){
+				this.dbParams.url = dbTypeMap.get(data)[2]
+				this.dbParams.xaDsClassName = dbTypeMap.get(data)[1]
+				this.dbParams.driverClass = dbTypeMap.get(data)[0];
 			}
 		}
 	});

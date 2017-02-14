@@ -108,9 +108,9 @@ public enum CodeGenerationPolicy {
 			if(StringUtils.isNotEmpty(dbParams.getPoolPreparedStatements())){
 				sb.append("#\u6253\u5f00PSCache\uff0c\u5e76\u4e14\u6307\u5b9a\u6bcf\u4e2a\u8fde\u63a5\u4e0aPSCache\u7684\u5927\u5c0f\n");
 				sb.append("poolPreparedStatements=" + dbParams.getPoolPreparedStatements() + "\n");
-			}
-			if(StringUtils.isNotEmpty(dbParams.getMaxPoolPreparedStatementPerConnectionSize())){
-				sb.append("maxPoolPreparedStatementPerConnectionSize=" + dbParams.getMaxPoolPreparedStatementPerConnectionSize() + "\n");
+				if(StringUtils.isNotEmpty(dbParams.getMaxPoolPreparedStatementPerConnectionSize())){
+					sb.append("maxPoolPreparedStatementPerConnectionSize=" + dbParams.getMaxPoolPreparedStatementPerConnectionSize() + "\n");
+				}
 			}
 			if(StringUtils.isNotEmpty(dbParams.getDialect())){
 				sb.append("#\u6570\u636e\u5e93\u65b9\u8a00\n");
