@@ -1,11 +1,5 @@
 package org.apel.hera.web;
 
-import java.io.File;
-
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
-
 import org.apel.gaia.util.ExportUtil;
 import org.apel.hera.biz.consist.FileConsist;
 import org.apel.hera.biz.domain.DBParams;
@@ -53,14 +47,15 @@ public class IndexController {
 		return ExportUtil.getResponseEntityByFile(bytes, FileConsist.DB_FILE_NAME);
 	}
 	
-	
-	
-	
-	public static void main(String[] args) throws Exception {
-		ZipFile zipFile = new ZipFile(new File("D:/1.zip"));
-		ZipParameters parameters = new ZipParameters();  
-		parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);  
-		parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
-		zipFile.addFolder("D:/sys_img", parameters);
+	/**
+	 * 下载控制台脚手架压缩
+	 */
+	@RequestMapping(value = "/downloadConsoleZip", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<byte[]> downloadConsoleZip(String packageName){
+		byte[] bytes = CodeGenerationPolicy.CONSOLE_SKETCH.generateSourceCode(packageName);
+		return ExportUtil.getResponseEntityByFile(bytes, FileConsist.threadExportName.get());
 	}
+	
+	
+	
 }

@@ -14,10 +14,15 @@ $(function(){
 		el: "#app",
 		data: function(){
 			return {
+				fullScreenShow:false,
 				dbTypes:["oracle", "mysql", "sqlserver", "h2", "dm"],
 				dbType:null,
+				consoleDialogShow: false,
 				settingsDialogShow: false,
 				dbDialogShow: false,
+				consoleParams:{
+					packageName: null
+				},
 				settingsParams:{
 					repositoryLocation: null,
 					nexusUser: null,
@@ -64,6 +69,11 @@ $(function(){
 		          xaDsClassName: [
 		            { required: true, message: '请输入XA数据源', trigger: 'change' }
 		          ]
+		        },
+		        consoleFormRules: {
+		        	packageName: [
+		            { required: true, message: '请输入包名', trigger: 'change' }
+		          ]
 		        }
 			};
 		},
@@ -102,7 +112,6 @@ $(function(){
 			downloadDbConfig: function(){//下载db配置文件信息
 				var context = this;
         		this.$refs['dbParamsForm'].validate(function(valid){
-        			console.log(context.dbParams);
         			if (valid) {
         				PlatformUI.simulateSubmitForm(contextPath + "/downloadDBConfig", context.dbParams, "post");
 			            context.dbDialogShow = false;
@@ -141,6 +150,30 @@ $(function(){
 				this.dbParams.url = dbTypeMap.get(data)[2]
 				this.dbParams.xaDsClassName = dbTypeMap.get(data)[1]
 				this.dbParams.driverClass = dbTypeMap.get(data)[0];
+			},
+			resetConsoleDialog: function(){
+				this.consoleDialogShow = false;
+				this.$refs['consoleForm'].resetFields();
+				this.consoleParams = {
+					packageName: null
+				};
+			},
+			downloadConsoleZip: function(){//下载db配置文件信息
+				var context = this;
+        		this.$refs['consoleForm'].validate(function(valid){
+        			if (valid) {
+        				PlatformUI.simulateSubmitForm(contextPath + "/downloadConsoleZip", {packageName: context.consoleParams.packageName}, "post");
+        				context.fullScreenShow = true;
+        				setTimeout(function() {
+				          context.fullScreenShow = false;
+				        }, 2000);
+			            context.consoleDialogShow = false;
+						context.$refs['consoleForm'].resetFields();
+			        } else {
+			            PlatformUI.message({message:"表单验证失败", type:"error"});
+			            return false;
+			        }
+        		});
 			}
 		}
 	});

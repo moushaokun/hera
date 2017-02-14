@@ -1,9 +1,21 @@
 package org.apel.hera.biz.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apel.gaia.util.UUIDUtil;
 import org.apel.hera.biz.consist.FileConsist;
 import org.apel.hera.biz.domain.DBParams;
 import org.apel.hera.biz.domain.SettingsConfigParam;
+import org.apel.hera.biz.domain.TemplateParam;
 import org.apel.hera.biz.util.CodeIOUtil;
 
 /**
@@ -122,6 +134,48 @@ public enum CodeGenerationPolicy {
 				return value;
 			});
 		}
+	},
+	/**
+	 * 控制台脚手架生成
+	 */
+	CONSOLE_SKETCH(FileConsist.CONSOLE_ZIP_NAME){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			String packageName = (String)templateParam;
+			byte[] resultBytes = null;
+			String localTemplatePath = System.getProperty("user.dir") + "/code_templates/";
+			String localTmpPath = System.getProperty("user.dir") + "/tmp/";
+			String tmpKey = UUIDUtil.uuid();
+			String tmpDir = localTmpPath + "/" + tmpKey;//在tmp下随机产生的临时文件夹
+			String exportZipName = tmpKey + ".zip";
+			FileConsist.threadExportName.set(exportZipName);
+			File exportZipFile = new File(localTmpPath + exportZipName);
+			try {
+				//产生Controller文件
+				CodeIOUtil.generateSourceFile(FileConsist.CONSOLE_CONTROLLER_TPL_NAME, value -> {
+					value = value.replace(TemplateParam.CONSOLE_SCAFFOLD_PACKAGE_NAME, packageName);
+					return value;
+				}, tmpDir, FileConsist.CONSOLE_CONTROLLER_NAME);
+				ZipFile zipFile = new ZipFile(exportZipFile);
+				ZipParameters parameters = new ZipParameters();  
+				parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);  
+				parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+				FileUtils.copyDirectory(new File(localTemplatePath + toString()), new File(tmpDir));//拷贝模板进入临时文件夹中
+				zipFile.addFolder(tmpDir, parameters);//将临时文件进行zip压缩
+				try(InputStream is = new FileInputStream(exportZipFile)){
+					resultBytes = IOUtils.toByteArray(is);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}finally{
+				FileUtils.deleteQuietly(new File(tmpDir));
+				FileUtils.deleteQuietly(exportZipFile);
+			}
+			return resultBytes;
+		}
+		
 	};
 	
 	
