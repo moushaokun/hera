@@ -9,6 +9,10 @@ dbTypeMap.put("h2", ["org.h2.Driver", "org.h2.jdbcx.JdbcDataSource", "jdbc:h2:F:
 dbTypeMap.put("dm", ["dm.jdbc.driver.DmDriver", "dm.jdbc.xa.DmdbXADataSource", "jdbc:dm://[ip]:[5236]"]);
 
 $(function(){
+	
+	
+	$(document).on('pjax:start', function() { NProgress.start(); });
+ 	$(document).on('pjax:end',   function() { NProgress.done();  });
 
 	vue = new Vue({
 		el: "#app",
@@ -180,3 +184,7 @@ $(function(){
 
 });
 
+/******************************方法区******************************/
+function linkToPage(url){
+	$.pjax({url: contextPath + url, container: '#container', fragment: "#container"});
+}
