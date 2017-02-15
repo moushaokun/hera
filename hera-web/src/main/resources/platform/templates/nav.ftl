@@ -11,15 +11,15 @@
 				id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
 					<#if activeNavItem == "工程管理">
-					  <li class="active"><a href="javascript:linkToPage('/project/index');">工程管理</a></li>
+					  <li class="active"><a href="${request.contextPath}/project/index">工程管理</a></li>
 					<#else>
-					  <li><a href="javascript:linkToPage('/project/index');">工程管理</a></li>
+					  <li><a href="${request.contextPath}/project/index">工程管理</a></li>
 					</#if>
 					
 					<#if activeNavItem == "常规模块管理">
-					  <li class="active"><a href="javascript:linkToPage('/simpleModule/index');">常规模块管理</a></li>
+					  <li class="active"><a href="${request.contextPath}/simpleModule/index">常规模块管理</a></li>
 					<#else>
-					  <li><a href="javascript:linkToPage('/simpleModule/index');">常规模块管理</a></li>
+					  <li><a href="${request.contextPath}/simpleModule/index">常规模块管理</a></li>
 					</#if>
 				</ul>
 			</div>
