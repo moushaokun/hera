@@ -11,7 +11,7 @@ $(function(){
 			return {
 				currentUserBaseInfo:{},
 				level2MenuName:"",
-				tabItems: [{name:'应用客户端管理', selected:true, closeable:false, url:contextPath + "/appclient/index"}]
+				tabItems: []
 			};
 		},
 		methods:{
