@@ -1,0 +1,2 @@
+server.port=#web_port#
+server.context-path=#context_path#
