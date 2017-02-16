@@ -14,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apel.gaia.util.UUIDUtil;
 import org.apel.hera.biz.consist.FileConsist;
 import org.apel.hera.biz.domain.DBParams;
+import org.apel.hera.biz.domain.Project;
+import org.apel.hera.biz.domain.ProjectParam;
 import org.apel.hera.biz.domain.SettingsConfigParam;
 import org.apel.hera.biz.domain.TemplateParam;
 import org.apel.hera.biz.util.CodeIOUtil;
@@ -174,6 +176,106 @@ public enum CodeGenerationPolicy {
 				FileUtils.deleteQuietly(exportZipFile);
 			}
 			return resultBytes;
+		}
+		
+	},
+	/**
+	 * 工程的application properties
+	 */
+	PROJECT_APPLICATION_PROPERTIES(ProjectParam.PROJECT_APPLICATION_PROPERTIES_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			ProjectParam projectParam = (ProjectParam)templateParam;
+			Project project = projectParam.getProject();
+			CodeIOUtil.generateSourceFile(toString(), value -> {
+				value = value.replaceAll(ProjectParam.WEB_PORT, project.getWebPort());
+				value = value.replaceAll(ProjectParam.CONTEXT_PATH, project.getContextPath());
+				return value;
+			}, projectParam.getPath(), ProjectParam.PROJECT_APPLICATION_PROPERTIES);
+			return null;
+		}
+		
+	},
+	/**
+	 * 工程的center properties
+	 */
+	PROJECT_CENTER_PROPERTIES(ProjectParam.PROJECT_CENTER_PROPERTIES_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			ProjectParam projectParam = (ProjectParam)templateParam;
+			Project project = projectParam.getProject();
+			String appId = StringUtils.isEmpty(project.getAppId()) ? "" : project.getAppId();
+			String casUrl = StringUtils.isEmpty(project.getCasUrl()) ? "" : project.getCasUrl();
+			String zkUrl = StringUtils.isEmpty(project.getZookeeperUrl()) ? "" : project.getZookeeperUrl();
+			CodeIOUtil.generateSourceFile(toString(), value -> {
+				value = value.replaceAll(ProjectParam.APP_ID, appId);
+				value = value.replaceAll(ProjectParam.CAS_URL, casUrl);
+				value = value.replaceAll(ProjectParam.ZK_URL, zkUrl);
+				return value;
+			}, projectParam.getPath(), ProjectParam.PROJECT_CENTER_PROPERTIES);
+			return null;
+		}
+		
+	},
+	/**
+	 * 工程的pom properties
+	 */
+	PROJECT_POM(ProjectParam.PROJECT_POM_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			ProjectParam projectParam = (ProjectParam)templateParam;
+			Project project = projectParam.getProject();
+			CodeIOUtil.generateSourceFile(toString(), value -> {
+				value = value.replaceAll(ProjectParam.MVN_VERSION, project.getMvnVersion());
+				value = value.replaceAll(ProjectParam.ARTIFACT_ID, project.getArtifactId());
+				if(!StringUtils.isEmpty(project.getAppId())){
+					value = value.replaceAll(ProjectParam.CAS_INTEGRATE, ProjectParam.CAS_INTEGRATE_VALUE);
+				}else{
+					value = value.replaceAll(ProjectParam.CAS_INTEGRATE, "");
+				}
+				return value;
+			}, projectParam.getPath(), ProjectParam.PROJECT_POM);
+			return null;
+		}
+		
+	},
+	/**
+	 * 工程的spring配置文件(不集成cas)
+	 */
+	PROJECT_SIMPLE_SPRING(ProjectParam.PROJECT_SIMPLE_SPRING_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			ProjectParam projectParam = (ProjectParam)templateParam;
+			Project project = projectParam.getProject();
+			String exportName = "module-" + project.getArtifactId() + ".xml";
+			CodeIOUtil.generateSourceFile(toString(), value -> {
+				value = value.replaceAll(ProjectParam.PACKAGE_NAME, project.getPackageName());
+				return value;
+			}, projectParam.getPath(), exportName);
+			return null;
+		}
+		
+	},
+	/**
+	 * 工程的spring配置文件(集成cas)
+	 */
+	PROJECT_SPRING(ProjectParam.PROJECT_SPRING_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			ProjectParam projectParam = (ProjectParam)templateParam;
+			Project project = projectParam.getProject();
+			String exportName = "module-" + project.getArtifactId() + ".xml";
+			CodeIOUtil.generateSourceFile(toString(), value -> {
+				value = value.replaceAll(ProjectParam.PACKAGE_NAME, project.getPackageName());
+				value = value.replaceAll(ProjectParam.ARTIFACT_ID, project.getArtifactId());
+				return value;
+			}, projectParam.getPath(), exportName);
+			return null;
 		}
 		
 	};

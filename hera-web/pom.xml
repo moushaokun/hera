@@ -45,5 +45,10 @@
 			<artifactId>hera-service</artifactId>
 			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apel</groupId>
+			<artifactId>poseidon-security-plug</artifactId>
+			<version>1.0.2-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

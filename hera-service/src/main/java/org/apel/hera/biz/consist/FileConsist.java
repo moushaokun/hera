@@ -7,6 +7,8 @@ package org.apel.hera.biz.consist;
  */
 public interface FileConsist {
 	ThreadLocal<String> threadExportName = new ThreadLocal<>();
+	final static String CODE_TEMPLATE_LOCAL_PATH = System.getProperty("user.dir") + "/code_templates";
+	final static String LICENSE_NAME = "v.license";
 	final static String BOOT_FILE_NAME = "application.properties";
 	final static String BOOT_TPL_NAME = "boot-config.template";
 	final static String SETTINGS_FILE_NAME = "settings.xml";

@@ -6,21 +6,191 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>工程管理</title>
 ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnotify}
+<link rel="stylesheet" href="${request.contextPath}/css/global.css">
 <link rel="stylesheet" type="text/css" href="${request.contextPath}/css/index.css" >
+<script type="text/javascript" src="${request.contextPath}/js/project_index.js"></script>
+<style type="text/css">
+	.fade-enter-active, .fade-leave-active {
+	  transition: opacity .5s
+	}
+	.fade-enter, .fade-leave-active {
+	  opacity: 0
+	}
+</style>
 </head>
 <body>
 	<div id="app">
 		<@nav.html activeNavItem="工程管理"></@nav.html>
 		
-		
 		<div id="container" class="fragment">
 			
-			<el-button type="primary" size="small">主要按钮</el-button>
+			<el-row>
+				<el-col :span="4">
+					<h5 class="tool-title">
+						工程管理
+					</h5>
+				</el-col>
+				<el-col :span="10" offset="10">
+					<div class="float-right">
+						<el-button type="primary" size="small" @click="showExpireDateDialog">license下载</el-button>
+						<el-button type="primary" size="small" @click="downloadProjectScaffold">工程脚手架下载</el-button>
+						<el-button type="primary" size="small" @click="alert(1)">功能代码下载</el-button>
+					</div>
+				</el-col>
+			</el-row>
 			
+			<div class="split-line"></div>
 			
-			<script type="text/javascript" src="${request.contextPath}/js/project_index.js"></script>
+			<el-row>
+				<el-form ref="toolBarForm" :model="toolBarForm" :inline="true">
+					<el-col :span="3">
+					  		<el-form-item>
+								<el-select v-model="toolBarForm.condition" size="small"  placeholder="搜索条件">
+									<el-option label="工程名称" value="projectName"></el-option>
+								</el-select>
+							</el-form-item>
+					</el-col>
+					<el-col :span="4">
+						<el-form-item>
+							<el-input v-model="toolBarForm.value" onkeyup="if(arguments[0].keyCode == 13)commonSearch();" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-form>
+				<el-col :span="13">
+					<el-button icon="search" size="small" @click="commonSearch" type="primary">搜索</el-button>
+					<el-button @click="add" size="small">新增</el-button>
+					<el-button icon="edit" size="small" @click="edit">编辑</el-button>
+					<el-button icon="delete" size="small" @click="del" type="danger" :plain="true">删除</el-button>
+					<el-button size="small" @click="exp">导出</el-button>
+					<el-button size="small" @click="compositeSearch">检索</el-button>
+					<el-button size="small" @click="refreshPage" v-loading.fullscreen.lock="fullscreenLoading">刷新</el-button>
+				</el-col>
+				<el-col :span="1" offset="3">
+					<div class="float-right">
+						<el-button icon="setting" size="small" @click="selectGridColumn"></el-button>
+					</div>
+				</el-col>
+			</el-row>
+			
+			<el-row>
+		  		<el-col :span="24">
+		  			<div>
+		  				<table id="list"></table>
+						<div id="pager"></div>
+					</div>
+		  		</el-col>
+			</el-row>
+			
 		</div>
 		
+		<el-dialog title="工程信息" size="large" v-model="dialogFormVisible" lock-scroll @close="resetForm">
+			<el-form ref="form" :rules="formRules" :model="form" label-width="100px">
+				
+				<el-row>
+					<el-col :span="8">
+						<el-form-item label="集成CAS"> 
+							<el-switch
+							  v-model="casFieldsShow"
+							  on-text="是"
+							  off-text="否">						
+						</el-form-item>
+					</el-col>
+				</el-row>
+				
+				<el-row>
+					<el-col :span="8">
+						<el-form-item label="工程名称" prop="projectName"> 
+							<el-input v-model="form.projectName" size="small" placeholder="请输入工程名称"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="8">
+						<el-form-item label="根包名" prop="packageName"> 
+							<el-input v-model="form.packageName" size="small" placeholder="请输入根包名"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="8">
+						<el-form-item label="mvn名" prop="artifactId"> 
+							<el-input v-model="form.artifactId" size="small" placeholder="请输入mvn_artifactId"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				
+				<el-row>
+					<el-col :span="8">
+						<el-form-item label="mvn版本" prop="mvnVersion"> 
+							<el-input v-model="form.mvnVersion" size="small" placeholder="请输入mvn版本"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="8">
+						<el-form-item label="web上下文" prop="contextPath"> 
+							<el-input v-model="form.contextPath" size="small" placeholder="请输入web上下文名称"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :span="8">
+						<el-form-item label="web端口" prop="webPort"> 
+							<el-input v-model="form.webPort" size="small" placeholder="请输入web端口"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				
+				<transition name="fade">
+					<el-row v-if="casFieldsShow">
+						<el-col :span="8">
+							<el-form-item label="ZK地址" prop="zookeeperUrl"> 
+								<el-input v-model="form.zookeeperUrl" size="small" placeholder="请输入zookeeper地址"></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :span="8">
+							<el-form-item label="appId" prop="appId"> 
+								<el-input v-model="form.appId" size="small" placeholder="请输入appId"></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :span="8">
+							<el-form-item label="cas地址" prop="casUrl"> 
+								<el-input v-model="form.casUrl" size="small" placeholder="请输入cas地址"></el-input>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</transition>
+				
+			</el-form> 
+			
+			<div slot="footer" class="dialog-footer">
+				<el-button type="primary" size="small" @click="onSubmit">{{submitBtnName}}</el-button>
+				<el-button size="small" @click="resetForm">取消</el-button>
+			</div>
+		</el-dialog>
+		
+		<el-dialog title="列表显示列" v-model="dialogGridSelectionVisible" lock-scroll>
+			<div class="col-sm-12">
+				<div class="grid-column-checkbox" v-for="col in checkboxCols">
+					 <el-checkbox v-model="col.visible">{{col.name}}</el-checkbox>
+				</div>
+			</div>
+			<div slot="footer" class="dialog-footer">
+				<el-button size="small" @click="dialogGridSelectionVisible = false">取 消</el-button>
+				<el-button type="primary" @click="saveColVisible" size="small" >确 定</el-button>
+			</div>
+		</el-dialog>
+		
+		<el-dialog title="过期时间" v-model="expireDateDialogShow" lock-scroll @close="resetExpireDateForm">
+			<el-row>
+				<el-form ref="expireForm" label-width="80px">
+					<el-col :span="20">
+						<el-form-item label="过期时间"> 
+							<el-date-picker size="small"
+								      v-model="expireDate"
+								      type="date"
+								      placeholder="选择日期">
+						</el-form-item>
+					</el-col>
+				</el-form>
+			</el-row>
+			<div slot="footer" class="dialog-footer">
+				<el-button type="primary" size="small" @click="downloadLicense">下载</el-button>
+				<el-button size="small" @click="resetExpireDateForm">取消</el-button>
+			</div>
+		</el-dialog>
 	</div>
 </body>
 </html>

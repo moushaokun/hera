@@ -23,5 +23,10 @@
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apel</groupId>
+			<artifactId>gaia-infrastructure</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>
