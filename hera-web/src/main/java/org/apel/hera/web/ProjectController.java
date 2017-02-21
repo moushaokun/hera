@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/project")
 public class ProjectController {
 
-private final static String INDEX_URL = "project_index";
+	private final static String INDEX_URL = "project_index";
 	
 	@Autowired
 	private ProjectService projectService;
