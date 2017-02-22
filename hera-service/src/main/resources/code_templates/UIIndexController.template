@@ -13,7 +13,6 @@ import org.apel.gaia.commons.i18n.MessageUtil;
 import org.apel.gaia.util.encryption.MD5Util;
 import org.apel.poseidon.api.CasService;
 import org.apel.poseidon.api.SystemUserService;
-import org.apel.poseidon.api.domain.AppClientInfo;
 import org.apel.poseidon.api.domain.SystemMenu;
 import org.apel.poseidon.api.domain.SystemUser;
 import org.apel.poseidon.security.commons.util.UserDetailsUtil;
@@ -107,10 +106,5 @@ public class UIIndexController {
 		return result;
 	} 
 	
-	@RequestMapping("all/enabledClient")
-	public @ResponseBody List<AppClientInfo> listAllEnabled(HttpSession session){
-		String userId = session.getAttribute(CommonConsist.CURRENT_USER_ID).toString();
-		return casProvider.getAppClientInfoByUserId(userId, UserDetailsUtil.getCurrentUser().getSuperAdmin());
-	}
 	
 }
