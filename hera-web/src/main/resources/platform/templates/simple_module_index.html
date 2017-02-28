@@ -8,6 +8,18 @@
 ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnotify}
 <link rel="stylesheet" href="${request.contextPath}/css/global.css">
 <link rel="stylesheet" type="text/css" href="${request.contextPath}/css/index.css" >
+<style type="text/css">
+	.field_col{
+		border:1px solid #8492A6;
+		height:30px;
+		width:100px;
+		white-space:nowrap; 
+		overflow:hidden; 
+		text-overflow:ellipsis;
+		padding:5px 10px;
+		cursor: pointer;
+	}
+</style>
 <script type="text/javascript" src="${request.contextPath}/js/simple_module_index.js"></script>
 </head>
 <body>
@@ -53,6 +65,7 @@ ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnoti
 					<el-button icon="edit" size="small" @click="edit">编辑</el-button>
 					<el-button icon="delete" size="small" @click="del" type="danger" :plain="true">删除</el-button>
 					<el-button size="small" @click="exp">导出</el-button>
+					<el-button size="small" @click="showFieldsDialog">字段配置</el-button>
 				</el-col>
 				<el-col :span="1" offset="3">
 					<div class="float-right">
@@ -121,6 +134,180 @@ ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnoti
 					<el-button size="small" @click="dialogGridSelectionVisible = false">取 消</el-button>
 					<el-button type="primary" @click="saveColVisible" size="small" >确 定</el-button>
 				</div>
+			</el-dialog>
+			
+			<el-dialog title="字段配置" size="large" v-model="dialogFieldsVisible" lock-scroll>
+				<el-row>
+					<el-col :span="12">
+						<el-button type="primary" @click="showFieldsRow" size="small" >添加行</el-button>
+					</el-col>
+				</el-row>
+				<el-row style="margin-top:10px;" v-for="(rowCol,index) in rowCols">
+					<el-col :span="col.span" v-for="(col, colIndex) in rowCol.cols">
+						<div class="field_col" v-on:dblclick="showFieldDetailDialog(col.id, index, colIndex)">
+							<span>{{col.fieldName}}</span>
+						</div>
+					</el-col>
+					<el-col :span="1">
+						<el-button type="text" @click="delRow(index)" size="small">删除</el-button>
+					</el-col>
+				</el-row>
+			</el-dialog>
+			
+			<el-dialog title="字段详情" size="large" v-model="fieldDetailDialogVisible" lock-scroll @close="resetFieldDetailForm">
+				<el-form ref="fieldDetailForm" :rules="fieldDetailFormRules" :model="fieldDetailForm" label-width="80px">
+					
+					<el-row>
+						<el-col :span="6">
+							<el-form-item label="字段名称" prop="name"> 
+								<el-input v-model="fieldDetailForm.name" size="small" placeholder="请输入字段名称"></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :span="6">
+							<el-form-item label="代码名称" prop="codeName"> 
+								<el-input v-model="fieldDetailForm.codeName" size="small" placeholder="请输入代码名称"></el-input>
+							</el-form-item>
+						</el-col>
+						
+						<el-col :span="6">
+							<el-form-item label="数据类型" prop="dataType">
+								<el-select size="small" v-model="fieldDetailForm.dataType" placeholder="请选择">
+									<el-option label="String" value="String"></el-option>
+									<el-option label="Integer" value="Integer"></el-option>
+									<el-option label="Long" value="Long"></el-option>
+									<el-option label="Short" value="Short"></el-option>
+									<el-option label="Boolean" value="Boolean"></el-option>
+									<el-option label="Double" value="Double"></el-option>
+									<el-option label="Float" value="Float"></el-option>
+									<el-option label="Date" value="Date"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+						
+						<el-col :span="6">
+							<el-form-item label="表单类型" prop="inputType">
+								<el-select size="small" v-model="fieldDetailForm.inputType" placeholder="请选择">
+									<el-option label="text" value="text"></el-option>
+									<el-option label="password" value="password"></el-option>
+									<el-option label="select" value="select"></el-option>
+									<el-option label="switch" value="switch"></el-option>
+									<el-option label="date" value="date"></el-option>
+									<el-option label="textarea" value="textarea"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					
+					<el-row>
+						<el-col :span="12">
+							<el-button type="primary" size="small" @click="showValidateRuleDialog">添加验证规则</el-button>
+						</el-col>
+					</el-row>
+					
+					<div style="margin-top:10px;"></div>
+					
+					<el-row v-for="(rule, index) in validateRules">
+						<el-col :span="5">
+							<el-form-item label="验证类型">
+								<el-input size="small" v-model="rule.validateType" readonly></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :span="5">
+							<el-form-item label="错误信息">
+								<el-input size="small" v-model="rule.errorMsg" readonly></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :span="5">
+							<el-form-item label="触发方式">
+								<el-input size="small" v-model="rule.validateTrigger" readonly></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :span="5">
+							<el-form-item label="验证值">
+								<el-input size="small" v-model="rule.vValue" readonly></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :offset="2" :span="2">
+							<el-button type="text" @click="showValidateRule(rule.id)" size="small">编辑</el-button>
+							<el-button type="text" @click="delValidateRule(rule.id, index)" size="small">删除</el-button>
+						</el-col>
+					</el-row>
+				</el-form> 
+				
+				<div slot="footer" class="dialog-footer">
+					<el-button type="primary" size="small" @click="onFieldDetailSubmit">保存</el-button>
+					<el-button type="danger" :plain="true" size="small" @click="deleteField">删除</el-button>
+					<el-button size="small" @click="resetFieldDetailForm">取消</el-button>  
+				</div>
+			</el-dialog>
+			
+			<el-dialog title="验证规则" size="small" v-model="dialogValidateFieldShow" lock-scroll @close="resetFieldValidateRuleForm">
+				<el-form ref="fieldValidateRuleForm" :rules="fieldValidateRuleFormRules" :model="fieldValidateRuleForm" label-width="80px">
+					<el-row>
+						<el-col :span="8">
+							<el-form-item label="验证类型" prop="validateType" >
+								<el-select size="small" @change="validateTypeSelectChange" v-model="fieldValidateRuleForm.validateType" placeholder="请选择验证类型">
+									<el-option label="integer" value="integer"></el-option>
+									<el-option label="float" value="float"></el-option>
+									<el-option label="array" value="array"></el-option>
+									<el-option label="date" value="date"></el-option>
+									<el-option label="url" value="url"></el-option>
+									<el-option label="email" value="email"></el-option>
+									<el-option label="required" value="required"></el-option>
+									<el-option label="length" value="length"></el-option>
+									<el-option label="range" value="range"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+						<el-col :span="8">
+							<el-form-item label="错误信息" prop="errorMsg">
+								<el-input size="small" v-model="fieldValidateRuleForm.errorMsg" placeholder="请输入错误信息"></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :span="8">
+							<el-form-item label="触发方式" prop="validateTrigger">
+								<el-select size="small" v-model="fieldValidateRuleForm.validateTrigger" placeholder="请选择触发方式">
+									<el-option label="change" value="change"></el-option>
+									<el-option label="blur" value="blur"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row v-if="validateValueShow">
+						<el-col :span="8">
+							<el-form-item label="值" prop="">
+								<el-input size="small" v-model="fieldValidateRuleForm.vValue" placeholder="请输入验证值"></el-input>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</el-form>
+				<div slot="footer" class="dialog-footer">
+					<el-button type="primary" size="small" @click="onValidateRuleSubmit">保存</el-button>
+					<el-button size="small" @click="resetFieldValidateRuleForm">取消</el-button>  
+				</div>
+			</el-dialog>
+			
+			<el-dialog title="行参数" size="small" v-model="dialogRowParamShow" lock-scroll>
+				<el-row>
+					<el-col :span="4">
+						<el-button size="small" @click="addFieldsRow(1)">一列</el-button>
+					</el-col>
+					<el-col :span="4">
+						<el-button size="small" @click="addFieldsRow(2)">二列</el-button>
+					</el-col>
+					<el-col :span="4">
+						<el-button size="small" @click="addFieldsRow(3)">三列</el-button>
+					</el-col>
+					<el-col :span="4">
+						<el-button size="small" @click="addFieldsRow(4)">四列</el-button>
+					</el-col>
+					<el-col :span="4">
+						<el-button size="small" @click="addFieldsRow(5)">五列</el-button>
+					</el-col>
+					<el-col :span="4">
+						<el-button size="small" @click="addFieldsRow(6)">六列</el-button>
+					</el-col>
+				</el-row>
 			</el-dialog>
 			
 		</div>

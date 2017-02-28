@@ -8,7 +8,9 @@ import org.apel.gaia.commons.jqgrid.QueryParams;
 import org.apel.gaia.commons.pager.PageBean;
 import org.apel.gaia.util.jqgrid.JqGridUtil;
 import org.apel.hera.biz.domain.Domain;
+import org.apel.hera.biz.domain.ModuleRowColumn;
 import org.apel.hera.biz.service.DomainService;
+import org.apel.hera.biz.service.ModuleRowColService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -27,6 +29,8 @@ public class SimpleModuleController {
 	
 	@Autowired
 	private DomainService domainService;
+	@Autowired
+	private ModuleRowColService moduleRowColService;
 	
 	//首页
 	@RequestMapping(value = "index", method = RequestMethod.GET)
@@ -82,5 +86,26 @@ public class SimpleModuleController {
 	public @ResponseBody List<Domain> getAll(){
 		return domainService.findAll(new Sort(Direction.DESC, "createDate"));
 	}
+	
+	//新增行列信息
+	@RequestMapping(value = "/addRowCol", method = RequestMethod.POST)
+	public @ResponseBody Message addRowCol(String moduleId, Integer colNum){
+		String rowColId = moduleRowColService.addRowCol(moduleId, colNum);
+		return MessageUtil.message("domain.create.success", rowColId);
+	}
+	
+	//删除行列信息
+	@RequestMapping(value = "/delRowCol", method = RequestMethod.POST)
+	public @ResponseBody Message delRowCol(String rowColId){
+		moduleRowColService.deleteById(rowColId);
+		return MessageUtil.message("domain.delete.success");
+	}
+	
+	//展现出模块所配的行列信息
+	@RequestMapping(value = "/listRowCol")
+	public @ResponseBody List<ModuleRowColumn> listRowCol(String moduleId){
+		return moduleRowColService.findByModuleId(moduleId);
+	}
+	
 	
 }
