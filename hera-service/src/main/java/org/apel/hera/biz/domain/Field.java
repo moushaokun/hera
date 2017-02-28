@@ -31,6 +31,8 @@ public class Field {
 	 */
 	private String inputType;
 
+	private String moduleId;
+
 	private String mark;
 
 	public String getId() {
@@ -79,6 +81,14 @@ public class Field {
 
 	public void setMark(String mark) {
 		this.mark = mark;
+	}
+
+	public String getModuleId() {
+		return moduleId;
+	}
+
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
 	}
 
 }

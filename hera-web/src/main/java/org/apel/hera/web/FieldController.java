@@ -79,13 +79,18 @@ public class FieldController {
 	}
 	
 	@RequestMapping(value = "/findByMark", method = RequestMethod.GET)
-	public @ResponseBody Field findByMark(String mark){
-		Condition c = new Condition();
-		c.setRelateType(RelateType.AND);
-		c.setOperation(Operation.EQ);
-		c.setPropertyName("mark");
-		c.setPropertyValue(mark);
-		List<Field> fields = fieldService.findByCondition(c);
+	public @ResponseBody Field findByMark(String moduleId, String mark){
+		Condition c1 = new Condition();
+		c1.setRelateType(RelateType.AND);
+		c1.setOperation(Operation.EQ);
+		c1.setPropertyName("mark");
+		c1.setPropertyValue(mark);
+		Condition c2 = new Condition();
+		c2.setRelateType(RelateType.AND);
+		c2.setOperation(Operation.EQ);
+		c2.setPropertyName("moduleId");
+		c2.setPropertyValue(moduleId);
+		List<Field> fields = fieldService.findByCondition(c1, c2);
 		if(fields.size() > 0){
 			return fields.get(0);
 		}else{

@@ -357,10 +357,12 @@ $(function(){
 		    },
 		    onFieldDetailSubmit: function(){
 				var context = this;
+				var ids = grid.jqGrid ('getGridParam', 'selarrrow');
         		this.$refs['fieldDetailForm'].validate(function(valid){
         			if (valid) {
         				var data = $.extend({}, context.fieldDetailForm);
         				data['mark'] = context.fieldMark;
+        				data['moduleId'] = ids[0];
         				var rowIndex = context.fieldMark.split("-")[0];
         				var colIndex = context.fieldMark.split("-")[1];
         				var actionUrl = contextPath + "/field";
@@ -574,10 +576,11 @@ function populateCols(rowNum, colNum, flag){
 			}
 		}
 		if(flag){
+			var ids = grid.jqGrid ('getGridParam', 'selarrrow');
 			var mark = rowNum - 1 + "-" + i;
 			PlatformUI.ajax({
 				url: contextPath + "/field/findByMark",
-				data: {mark: mark},
+				data: {mark: mark, moduleId:ids[0]},
 				async: false,
 				afterOperation: function(data){
 					if(data.id){
