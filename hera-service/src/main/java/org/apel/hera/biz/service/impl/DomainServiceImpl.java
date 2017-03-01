@@ -7,6 +7,7 @@ import org.apel.gaia.commons.pager.Condition;
 import org.apel.gaia.commons.pager.Operation;
 import org.apel.gaia.commons.pager.RelateType;
 import org.apel.gaia.infrastructure.impl.AbstractBizCommonService;
+import org.apel.hera.biz.dao.DomainRepository;
 import org.apel.hera.biz.domain.Domain;
 import org.apel.hera.biz.domain.Field;
 import org.apel.hera.biz.domain.ModuleRowColumn;
@@ -47,6 +48,11 @@ public class DomainServiceImpl extends AbstractBizCommonService<Domain, String> 
 			fieldService.deleteById(fieldIds);
 		}
 		super.deleteById(ids);
+	}
+
+	@Override
+	public List<Domain> findByProjectId(String projectId) {
+		return ((DomainRepository)getRepository()).findByProjectId(projectId);	
 	}
 	
 }

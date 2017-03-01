@@ -2,6 +2,8 @@ package org.apel.hera.biz.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
@@ -13,16 +15,36 @@ import org.apache.commons.lang3.StringUtils;
 import org.apel.gaia.infrastructure.impl.AbstractBizCommonService;
 import org.apel.gaia.util.UUIDUtil;
 import org.apel.hera.biz.consist.FileConsist;
+import org.apel.hera.biz.domain.Domain;
 import org.apel.hera.biz.domain.Project;
 import org.apel.hera.biz.domain.ProjectParam;
 import org.apel.hera.biz.service.CodeGenerationPolicy;
+import org.apel.hera.biz.service.DomainService;
 import org.apel.hera.biz.service.ProjectService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 public class ProjectServiceImpl extends AbstractBizCommonService<Project, String> implements ProjectService{
+
+	@Autowired
+	private DomainService domainService;
+	
+	
+	
+	@Override
+	public void deleteById(String... ids) {
+		for (String id : ids) {
+			List<Domain> domains = domainService.findByProjectId(id);
+			String[] domainIds = domains.stream().map(e -> e.getId()).collect(Collectors.toList()).toArray(new String[]{});
+			domainService.deleteById(domainIds);
+		}
+		super.deleteById(ids);
+	}
+
+
 
 	@Override
 	public byte[] generateProjectScaffold(String projectId) {
