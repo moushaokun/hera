@@ -9,6 +9,7 @@ public class JavaCoreParam {
 	public final static String TABLE_NAME = "#tableName#";
 	public final static String CLASS_NAME = "#domain#";
 	public final static String DOMAIN_NAME = "#domainName#";
+	public final static String MODULE_NAME = "#moduleName#";
 	public final static String FIELDS = "#fields#";
 	public final static String FIELD_METHODS = "#fieldMethods#";
 	public final static String DOMAIN_TEMPLATE = "domain.template";
@@ -17,6 +18,11 @@ public class JavaCoreParam {
 	public final static String REPOSITORY_TEMPLATE = "dao.template";
 	public final static String CONTROLLER_TEMPLATE = "controller.template";
 	public final static String I18N_TEMPLATE = "i18n.template";
+	public final static String HTML_TEMPLATE = "html.template";
+	public final static String JS_TEMPLATE = "js.template";
+	public final static String SEARCH_FIELDS = "#search_fields#";
+	public final static String FORM_FIELDS = "#form_fields#";
+	
 	
 	private Domain domain;
 

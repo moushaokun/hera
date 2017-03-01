@@ -1,8 +1,11 @@
 package org.apel.hera.biz.domain;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "robot_field")
@@ -34,8 +37,11 @@ public class Field {
 	private String moduleId;
 
 	private String mark;
-	
+
 	private Boolean isSearch;
+
+	@Transient
+	private List<FieldValidateRule> validateRules;
 
 	public String getId() {
 		return id;
@@ -99,6 +105,14 @@ public class Field {
 
 	public void setIsSearch(Boolean isSearch) {
 		this.isSearch = isSearch;
+	}
+
+	public List<FieldValidateRule> getValidateRules() {
+		return validateRules;
+	}
+
+	public void setValidateRules(List<FieldValidateRule> validateRules) {
+		this.validateRules = validateRules;
 	}
 
 }

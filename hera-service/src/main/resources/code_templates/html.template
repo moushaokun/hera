@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>#moduleName#</title>
   ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnotify}
-  <script type="text/javascript" src="${request.contextPath}/js/#domianName#_index.js"></script>
+  <script type="text/javascript" src="${request.contextPath}/js/#domainName#_index.js"></script>
 	<link rel="stylesheet" href="${request.contextPath}/css/global.css">
 </head>
 <body>
@@ -17,9 +17,9 @@
 			</el-col>
 			<el-col :span="10" offset="10">
 				<div class="float-right">
-					<el-button type="primary" @click="add" size="small" icon="plus">ĞÂÔö</el-button>
-					<el-button size="small" @click="compositeSearch">¼ìË÷</el-button>
-					<el-button size="small" @click="refreshPage" v-loading.fullscreen.lock="fullscreenLoading">Ë¢ĞÂ</el-button>
+					<el-button type="primary" @click="add" size="small" icon="plus">æ–°å¢</el-button>
+					<el-button size="small" @click="compositeSearch">æ£€ç´¢</el-button>
+					<el-button size="small" @click="refreshPage" v-loading.fullscreen.lock="fullscreenLoading">åˆ·æ–°</el-button>
 				</div>
 			</el-col>
 		</el-row>
@@ -30,8 +30,8 @@
 			<el-form ref="toolBarForm" :model="toolBarForm" :inline="true">
 				<el-col :span="3">
 				  		<el-form-item>
-							<el-select v-model="toolBarForm.condition" size="small"  placeholder="ËÑË÷Ìõ¼ş">
-								<el-option label="Ô±¹¤ĞÕÃû" value="employeeName"></el-option>
+							<el-select v-model="toolBarForm.condition" size="small"  placeholder="æœç´¢æ¡ä»¶">
+#search_fields#
 							</el-select>
 						</el-form-item>
 				</el-col>
@@ -42,10 +42,10 @@
 				</el-col>
 			</el-form>
 			<el-col :span="13">
-				<el-button icon="search" size="small" @click="commonSearch" type="primary">ËÑË÷</el-button>
-				<el-button icon="edit" size="small" @click="edit">±à¼­</el-button>
-				<el-button icon="delete" size="small" @click="del" type="danger" :plain="true">É¾³ı</el-button>
-				<el-button size="small" @click="exp">µ¼³ö</el-button>
+				<el-button icon="search" size="small" @click="commonSearch" type="primary">æœç´¢</el-button>
+				<el-button icon="edit" size="small" @click="edit">ç¼–è¾‘</el-button>
+				<el-button icon="delete" size="small" @click="del" type="danger" :plain="true">åˆ é™¤</el-button>
+				<el-button size="small" @click="exp">å¯¼å‡º</el-button>
 			</el-col>
 			<el-col :span="1" offset="3">
 				<div class="float-right">
@@ -62,61 +62,30 @@
 	  		</el-col>
 		</el-row>
 	
-		<el-dialog title="Ô±¹¤ĞÅÏ¢" v-model="dialogFormVisible" lock-scroll @close="resetForm">
+		<el-dialog title="è¯¦ç»†ä¿¡æ¯" v-model="dialogFormVisible" lock-scroll @close="resetForm">
 			<el-form ref="form" :rules="formRules" :model="form" label-width="80px">
 				
-				<el-row>
-					<el-col :span="16">
-						<el-form-item label="Ô±¹¤ĞÕÃû" prop="employeeName"> 
-							<el-input v-model="form.employeeName" size="small" placeholder="ÇëÊäÈëÔ±¹¤ĞÕÃû"></el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
-				
-				<el-row>
-					<el-col :span="24">
-						<el-form-item label="³öÉúÈÕÆÚ" prop="birthday"> 
-							<el-date-picker size="small"
-							      v-model="form.birthday"
-							      type="datetime"
-							      placeholder="Ñ¡ÔñÈÕÆÚ">
-						</el-form-item>
-					</el-col>
-				</el-row>
-				
-				<el-row>
-					<el-col :span="12">
-						<el-form-item label="ÄêÁä" prop="age"> 
-							<el-input-number size="small" v-model="form.age" :min="0"></el-input-number>
-						</el-form-item>
-					</el-col>
-				
-					<el-col :span="12">
-						<el-form-item label="ÊÇ·ñÒÑ»é" prop="isMarried"> 
-							<el-switch on-text="ÊÇ" off-text="·ñ" v-model="form.isMarried"></el-switch> 
-						</el-form-item>
-					</el-col>
-				</el-row>
+#form_fields#
 				
 				<el-row>
 					<el-col :span="8" offset="8" >
 						<el-button type="primary" size="small" @click="onSubmit">{{submitBtnName}}</el-button>
-						<el-button size="small" @click="resetForm">È¡Ïû</el-button>  
+						<el-button size="small" @click="resetForm">å–æ¶ˆ</el-button>  
 					</el-col>
 				</el-row>
 			
 			</el-form> 
 		</el-dialog>
 			
-		<el-dialog title="ÁĞ±íÏÔÊ¾ÁĞ" v-model="dialogGridSelectionVisible" lock-scroll>
+		<el-dialog title="åˆ—è¡¨æ˜¾ç¤ºåˆ—" v-model="dialogGridSelectionVisible" lock-scroll>
 			<div class="col-sm-12">
 				<div class="grid-column-checkbox" v-for="col in checkboxCols">
 					 <el-checkbox v-model="col.visible">{{col.name}}</el-checkbox>
 				</div>
 			</div>
 			<div slot="footer" class="dialog-footer">
-				<el-button size="small" @click="dialogGridSelectionVisible = false">È¡ Ïû</el-button>
-				<el-button type="primary" @click="saveColVisible" size="small" >È· ¶¨</el-button>
+				<el-button size="small" @click="dialogGridSelectionVisible = false">å– æ¶ˆ</el-button>
+				<el-button type="primary" @click="saveColVisible" size="small" >ç¡® å®š</el-button>
 			</div>
 		</el-dialog>
 

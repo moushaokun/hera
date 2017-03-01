@@ -3,7 +3,7 @@ package org.apel.hera.biz.consist;
 public enum InputTypeConsist {
 
 	TEXT("text"),PASSWORD("password"),SELECT("select"),SWITCH("switch"),DATE("date"),
-	CHECKBOX("checkbox"),RADIO("radio"),TEXTAREA("textarea");
+	CHECKBOX("checkbox"),RADIO("radio"),TEXTAREA("textarea"),NUMBER("number");
 	
 	
 	private String name;

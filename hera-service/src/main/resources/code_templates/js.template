@@ -7,35 +7,24 @@ $(function(){
 		el: '#app',
 		data: function(){
 			return {
-				checkboxCols:[],//ÁĞ±í×Ö¶Î
-				dialogGridSelectionVisible: false,//ÁĞ±í×Ö¶ÎÑ¡ÔñdialogÏÔÊ¾
-				fullscreenLoading: false,//È«ÆÁloadingÌõ
+				checkboxCols:[],//åˆ—è¡¨å­—æ®µ
+				dialogGridSelectionVisible: false,//åˆ—è¡¨å­—æ®µé€‰æ‹©dialogæ˜¾ç¤º
+				fullscreenLoading: false,//å…¨å±loadingæ¡
 				toolBarForm: {
 					value: "",
 					condition: ""
-				},//top¹¤¾ßformÊı¾İ
-				form: {//±íµ¥Êı¾İ
-					id: '',
-			        employeeName: '',
-			        age: 0,
-			        isMarried: true,
-			        birthday: null
-		        },
+				},//topå·¥å…·formæ•°æ®
+				form: #formFieldsJson#,
 		        formRules: {
-		          employeeName: [
-		            { required: true, message: 'ÇëÊäÈëÔ±¹¤', trigger: 'change' }
-		          ],
-		          birthday: [
-		          	{ type: 'date', required: true, message: 'ÇëÑ¡ÔñÈÕÆÚ', trigger: 'change' }
-		          ]
+		        	#validateRules#
 		        },
-		        dialogFormVisible: false,//dialogÊÇ·ñÏÔÊ¾
+		        dialogFormVisible: false,//dialogæ˜¯å¦æ˜¾ç¤º
 		        formEdit: false,
-		        submitBtnName: "Á¢¼´´´½¨"
+		        submitBtnName: "ç«‹å³åˆ›å»º"
 			};
 		},
 		methods:{
-			compositeSearch: function(){//¼ìË÷
+			compositeSearch: function(){//æ£€ç´¢
 				var context = this;
 				grid.jqGrid("setGridParam", {
 					postData: {filters:{}}
@@ -48,49 +37,49 @@ $(function(){
 					}
 				});
 			},
-			refreshPage: function(){//Ë¢ĞÂ
+			refreshPage: function(){//åˆ·æ–°
 				this.fullscreenLoading = true;
 				setTimeout(function(){
 					location.reload();
 				}, 1000);
 			},
-			add: function(){//ĞÂÔö
+			add: function(){//æ–°å¢
 				this.dialogFormVisible = true;
 				this.formEdit = false;
-				this.submitBtnName = "Á¢¼´´´½¨";
+				this.submitBtnName = "ç«‹å³åˆ›å»º";
 			},
-			edit: function(){//±à¼­
+			edit: function(){//ç¼–è¾‘
 				var ids = grid.jqGrid ('getGridParam', 'selarrrow');
 				if(ids.length != 1){
-					PlatformUI.message({message: "Ñ¡ÔñÒ»ÌõÒª±à¼­µÄÊı¾İ!", type: "warning"});
+					PlatformUI.message({message: "é€‰æ‹©ä¸€æ¡è¦ç¼–è¾‘çš„æ•°æ®!", type: "warning"});
 					return;
 				}
 				var context = this;
 				this.dialogFormVisible = true;
 				this.formEdit = true;
-				this.submitBtnName = "±à¼­Ìá½»";
+				this.submitBtnName = "ç¼–è¾‘æäº¤";
 				PlatformUI.ajax({
-					url: contextPath + "/employee/" + ids[0],
+					url: contextPath + "/#domainName#/" + ids[0],
 					afterOperation: function(data, textStatus,jqXHR){
 						delete data.createDate;
-						data.birthday = new Date(data.birthday);
+						#dateFieldsToDate#
 						context.form = $.extend(context.form, data);
 					}
 				});
 			},
-			del: function(){//É¾³ı 
+			del: function(){//åˆ é™¤ 
 				var ids = grid.jqGrid ('getGridParam', 'selarrrow');
 				if(ids.length == 0){
-					PlatformUI.message({message:"ÇëÖÁÉÙÑ¡ÔñÒ»ÌõÒªÉ¾³ıµÄÊı¾İ!", type:"warning"});
+					PlatformUI.message({message:"è¯·è‡³å°‘é€‰æ‹©ä¸€æ¡è¦åˆ é™¤çš„æ•°æ®!", type:"warning"});
 					return;
 				}
-				this.$confirm('´Ë²Ù×÷½«ÓÀ¾ÃÉ¾³ıÊı¾İ, ÊÇ·ñ¼ÌĞø?', 'ÌáÊ¾', {
-		          confirmButtonText: 'È·¶¨',
-		          cancelButtonText: 'È¡Ïû',
+				this.$confirm('æ­¤æ“ä½œå°†æ°¸ä¹…åˆ é™¤æ•°æ®, æ˜¯å¦ç»§ç»­?', 'æç¤º', {
+		          confirmButtonText: 'ç¡®å®š',
+		          cancelButtonText: 'å–æ¶ˆ',
 		          type: 'warning'
 		        }).then(function(){
 		        	PlatformUI.ajax({
-						url: contextPath + "/employee",
+						url: contextPath + "/#domainName#",
 						type: "post",
 						data: {_method:"delete",ids:ids},
 						message:PlatformUI.message,
@@ -100,29 +89,23 @@ $(function(){
 					});
 		        });
 			},
-			exp: function(){//µ¼³ö
-				PlatformUI.exportGrid("list", "from t_employee");
+			exp: function(){//å¯¼å‡º
+				PlatformUI.exportGrid("list", "from #tableName#");
 			},
 			resetForm: function(){
 				this.dialogFormVisible = false;
 				this.$refs['form'].resetFields();
-				this.form = {
-					id: '',
-			        employeeName: '',
-			        age: 0,
-			        isMarried: true,
-			        birthday: null
-		        };
+				this.form = #formFieldsJson#;
 			},
-			onSubmit: function(){//µ¯³ö±íµ¥µÄÌá½»
+			onSubmit: function(){//å¼¹å‡ºè¡¨å•çš„æäº¤
 				var context = this;
         		this.$refs['form'].validate(function(valid){
         			if (valid) {
         				var data = $.extend({}, context.form);
-        				data.birthday = ExtendDate.getFormatDateByLong(data.birthday.getTime(), 'yyyy-MM-dd hh:mm:ss');
-        				var actionUrl = contextPath + "/employee";
+        				#dateFieldsToStr#
+        				var actionUrl = contextPath + "/#domainName#";
         				if(context.formEdit){
-        					actionUrl = contextPath + "/employee/" + data.id;
+        					actionUrl = contextPath + "/#domainName#/" + data.id;
 				            data['_method'] = "put";
         				}
         				PlatformUI.ajax({
@@ -139,7 +122,7 @@ $(function(){
 			            context.dialogFormVisible = false;
 						context.$refs['form'].resetFields();
 			        } else {
-			            PlatformUI.message({message:"±íµ¥ÑéÖ¤Ê§°Ü", type:"error"});
+			            PlatformUI.message({message:"è¡¨å•éªŒè¯å¤±è´¥", type:"error"});
 			            return false;
 			        }
         		});
@@ -159,32 +142,28 @@ $(function(){
 		    		}
 		    	}
 		    	this.dialogGridSelectionVisible = false;
-		    	//ÖØÉèjqrid¿í¶È
+		    	//é‡è®¾jqridå®½åº¦
 		    	PlatformUI.fineTuneGridSize(grid, 35);
 		    }
 		}
 	});
 	
-	//°ó¶¨jqgrid resizeÊÂ¼ş
+	//ç»‘å®šjqgrid resizeäº‹ä»¶
 	$(window).bind('resize', function() {
 		PlatformUI.resizeGridWidth(grid, 35);
 	});
 	
 	grid = $("#list").jqGrid({
-        url: contextPath + "/employee",
+        url: contextPath + "/#domainName#",
         datatype: "json",
         autowidth: true,
         height:300,
         mtype: "GET",
         multiselect: true,
-        colNames: ["ID", "Ô±¹¤ĞÕÃû", "ÄêÁä", "ÊÇ·ñÒÑ»é", "³öÉúÈÕÆÚ", "´´½¨Ê±¼ä"],
+        colNames: #jqGridColNames#,
         colModel: [
-            { name: "id", index:"id",hidden: true},
-            { name: "employeeName", index:"employeeName", align:"center", sortable: true},
-            { name: "age", width:100,index:"age",align:"center", sortable: true },	
-            { name:"isMarried", width:100, index:"isMarried",expType:"boolean",expValue:{'true':'ÊÇ','false':'·ñ'},align:"center", formatter: PlatformUI.defaultYNFormatter, stype:"select", searchoptions:{value:"true:ÊÇ;false:·ñ"}},
-            { name: "birthday", index:"birthday",align:"center", expType:"date",expValue:"yyyy-MM-dd HH:mm:ss",searchoptions:{dataInit:PlatformUI.defaultJqueryUIDatePick}, sortable: true ,formatter:"date",formatoptions: { srcformat: "U", newformat: "Y-m-d H:i:s" }},
-            { name: "createDate", index:"createDate",align:"center", expType:"date",expValue:"yyyy-MM-dd HH:mm:ss",searchoptions:{dataInit:PlatformUI.defaultJqueryUIDatePick}, sortable: true ,formatter:"date",formatoptions: { srcformat: "U", newformat: "Y-m-d H:i:s" }}],
+			#jqGridColModel#
+        ],
         pager: "#pager",
         rowNum: 10,
         rowList: [10, 20, 30],
@@ -193,10 +172,10 @@ $(function(){
         viewrecords: true,
         gridview: true,
         autoencode: true,
-        caption: "Ô±¹¤ÁĞ±í",
+        caption: "å‘˜å·¥åˆ—è¡¨",
     	gridComplete: function(){
     		PlatformUI.fineTuneGridSize(grid, 42);
-    		//ÉèÖÃÒş²Ø/ÏÔÊ¾ÁĞ×Ö¶Î
+    		//è®¾ç½®éšè—/æ˜¾ç¤ºåˆ—å­—æ®µ
     		vue.checkboxCols = [];
     		var gridColModel = grid.getGridParam("colModel");
 	    	var gridColNames = grid.getGridParam("colNames");
@@ -216,17 +195,17 @@ $(function(){
 			
 });
 
-/***********************·½·¨Çø***************************/
+/***********************æ–¹æ³•åŒº***************************/
 
 function commonSearch(){
 	var name = vue.toolBarForm.condition;
 	var value = vue.toolBarForm.value;
 	if(name == ""){
-		PlatformUI.message({message:"ÇëÑ¡ÔñËÑË÷Ìõ¼ş", type:"warning"});
+		PlatformUI.message({message:"è¯·é€‰æ‹©æœç´¢æ¡ä»¶", type:"warning"});
 		return;
 	}
 	if(value == ""){
-		PlatformUI.message({message:"ÇëÊäÈëËÑË÷ÄÚÈİ", type:"warning"});
+		PlatformUI.message({message:"è¯·è¾“å…¥æœç´¢å†…å®¹", type:"warning"});
 		return;
 	}
 	var rules = [{"field":name,"op":"cn","data":value.trim()}];

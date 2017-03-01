@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
@@ -14,16 +15,19 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apel.gaia.util.UUIDUtil;
 import org.apel.hera.biz.consist.FileConsist;
+import org.apel.hera.biz.consist.InputTypeConsist;
 import org.apel.hera.biz.domain.DBParams;
 import org.apel.hera.biz.domain.Domain;
 import org.apel.hera.biz.domain.Field;
 import org.apel.hera.biz.domain.JavaCoreParam;
+import org.apel.hera.biz.domain.ModuleRowColumn;
 import org.apel.hera.biz.domain.Project;
 import org.apel.hera.biz.domain.ProjectParam;
 import org.apel.hera.biz.domain.SettingsConfigParam;
 import org.apel.hera.biz.domain.TemplateParam;
 import org.apel.hera.biz.util.CodeIOUtil;
 import org.apel.hera.biz.util.CodePropertyUtil;
+import org.springframework.util.CollectionUtils;
 
 /**
  * 枚举抽象策略模式，代码机器人核心
@@ -398,8 +402,103 @@ public enum CodeGenerationPolicy {
 			});
 		}
 		
+	},
+	/**
+	 * html文件产生
+	 */
+	HTML_TEMPLATE(JavaCoreParam.HTML_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
+			Domain d = javaCoreParam.getDomain();
+			List<Field> fields = javaCoreParam.getFields();
+			String className = d.getClassName();
+			String domainName = String.valueOf(Character.toLowerCase(className.charAt(0))) + className.substring(1, className.length());
+			//搜索框html
+			StringBuffer searchFieldsSb = new StringBuffer("");
+			for (int i = 0; i < fields.size(); i++) {
+				Field field = fields.get(i);
+				if(field.getIsSearch() != null && field.getIsSearch()){
+					searchFieldsSb.append("\t\t\t\t\t\t\t\t<el-option label=\"" + field.getName() + "\" value=\"" + field.getCodeName() + "\"></el-option>\n");
+				}
+			}
+			String searchFields = searchFieldsSb.toString();
+			//表单html
+			StringBuffer formFieldStr = new StringBuffer();
+			List<ModuleRowColumn> rowCols = d.getRowCols();
+			if(!CollectionUtils.isEmpty(rowCols)){
+				for (int i = 0; i < rowCols.size(); i++) {
+					ModuleRowColumn rowCol = rowCols.get(i);
+					StringBuffer rowHtml = new StringBuffer();
+					rowHtml.append("\t\t\t\t<el-row>\n");
+					Integer colNum = rowCol.getColNum();
+					int maxColNum = 24;
+					if(colNum == 5){
+						maxColNum += 1;
+					}
+					int span = maxColNum / colNum;
+					for (int j = 0; j < colNum; j++) {
+						if(colNum == 5 && (j == colNum - 1)){
+							span = span - 1;
+						}
+						Field field = findFieldsByRowAndColIndex(fields, i, j);
+						String colHtml = "";
+						if(field != null){//根据行列坐标查找字段，如果找到根据字段信息渲染html
+							colHtml = "\t\t\t\t\t<el-col :span=\"#span#\">\n\t\t\t\t\t\t<el-form-item label=\"#fieldName#\" prop=\"#fieldCodeName#\">\n#formInput#\t\t\t\t\t\t</el-form-item>\n\t\t\t\t\t</el-col>\n";
+							String formInput = "";
+							if(field.getInputType().equals(InputTypeConsist.PASSWORD)){
+								formInput = "\t\t\t\t\t\t\t<el-input v-model=\"form.#fieldCodeName#\" type=\"password\" size=\"small\" placeholder=\"请输入#fieldName#\"></el-input>\n";
+							}else if(field.getInputType().equals(InputTypeConsist.SELECT)){
+								formInput = "\t\t\t\t\t\t\t<el-select size=\"small\" v-model=\"form.#fieldCodeName#\" placeholder=\"请选择\">\n\t\t\t\t\t\t\t\t<el-option label=\"选项一\" value=\"选项一\"></el-option>\n\t\t\t\t\t\t\t</el-select>\n";
+							}else if(field.getInputType().equals(InputTypeConsist.SWITCH)){
+								formInput = "\t\t\t\t\t\t\t<el-switch on-text=\"是\" off-text=\"否\" v-model=\"form.#fieldCodeName#\"></el-switch>\n";
+							}else if(field.getInputType().equals(InputTypeConsist.DATE)){
+								formInput = "\t\t\t\t\t\t\t<el-date-picker size=\"small\" v-model=\"form.#fieldCodeName#\" type=\"datetime\" placeholder=\"选择日期\"></el-date-picker>\n";
+							}else if(field.getInputType().equals(InputTypeConsist.TEXTAREA)){
+								formInput = "\t\t\t\t\t\t\t<el-input v-model=\"form.#fieldCodeName#\" type=\"textarea\" size=\"small\" placeholder=\"请输入#fieldName#\"></el-input>\n";
+							}else if(field.getInputType().equals(InputTypeConsist.NUMBER)){
+								formInput = "\t\t\t\t\t\t\t<el-input-number size=\"small\" v-model=\"form.#fieldCodeName#\" :min=\"0\"></el-input-number>\n";
+							}else{
+								formInput = "\t\t\t\t\t\t\t<el-input v-model=\"form.#fieldCodeName#\" size=\"small\" placeholder=\"请输入#fieldName#\"></el-input>\n";
+							}
+							colHtml = colHtml.replaceAll("#formInput#", formInput).replaceAll("#span#", String.valueOf(span))
+									.replaceAll("#fieldName#", field.getName()).replaceAll("#fieldCodeName#", field.getCodeName());
+						}else{//没有找到添加空
+							colHtml = "\t\t\t\t\t<el-col :span=\"" + span + "\"></el-col>\n";
+						}
+						rowHtml.append(colHtml);
+					}
+					rowHtml.append("\t\t\t\t</el-row>\n");
+					formFieldStr.append(rowHtml);
+				}
+			}
+			
+			return CodeIOUtil.generateSourceBytes(toString(), value -> {
+				value = value.replaceAll(JavaCoreParam.MODULE_NAME, d.getDomainName());
+				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, domainName);
+				value = value.replaceAll(JavaCoreParam.SEARCH_FIELDS, searchFields);
+				value = value.replaceAll(JavaCoreParam.FORM_FIELDS, formFieldStr.toString());
+				return value;
+			});
+		}
+		
 	};
 	
+	private static Field findFieldsByRowAndColIndex(List<Field> fields, int rowIndex, int colIndex) {
+		Optional<Field> optional = fields.stream().filter(f -> {
+			if(Integer.valueOf(f.getMark().split("-")[0]) == rowIndex 
+					&& Integer.valueOf(f.getMark().split("-")[1]) == colIndex){
+				return true;
+			}
+			return false;
+		}).findFirst();
+		if(optional.isPresent()){
+			return optional.get();
+		}else{
+			return null;
+		}
+	}
 	
 	private final String value;
 	

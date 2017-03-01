@@ -1,12 +1,14 @@
 package org.apel.hera.biz.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "robot_domain")
@@ -24,6 +26,9 @@ public class Domain {
 	@ManyToOne
 	@JoinColumn(name = "projectId")
 	private Project project;
+
+	@Transient
+	private List<ModuleRowColumn> rowCols;
 
 	private Date createDate;
 
@@ -73,6 +78,14 @@ public class Domain {
 
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
+	}
+
+	public List<ModuleRowColumn> getRowCols() {
+		return rowCols;
+	}
+
+	public void setRowCols(List<ModuleRowColumn> rowCols) {
+		this.rowCols = rowCols;
 	}
 
 }
