@@ -31,7 +31,8 @@ $(function(){
 		        	name:null,
 		        	codeName:null,
 		        	dataType:null,
-		        	inputType: null
+		        	inputType: null,
+		        	isSearch:false
 		        },
 		        fieldDetailFormRules:{
 			    	name: [
@@ -331,7 +332,8 @@ $(function(){
 		        	name:null,
 		        	codeName:null,
 		        	dataType:null,
-		        	inputType: null
+		        	inputType: null,
+		        	isSearch:false
 		        };
 		    },
 		    showValidateRuleDialog: function(){
@@ -481,6 +483,13 @@ $(function(){
 	     				}
 	     			});
 		        });
+     		},
+     		downloadCode: function(){//下载代码
+     			var ids = grid.jqGrid ('getGridParam', 'selarrrow');
+				if(ids.length != 1){
+					PlatformUI.message({message:"请选择一条要操作的数据!", type:"warning"});
+					return;
+				}
      		}
 		}
 	});
@@ -513,7 +522,7 @@ $(function(){
         viewrecords: true,
         gridview: true,
         autoencode: true,
-        caption: "员工列表",
+        caption: "实体列表",
     	gridComplete: function(){
     		PlatformUI.fineTuneGridSize(grid, 62);
     		//设置隐藏/显示列字段

@@ -66,6 +66,7 @@ ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnoti
 					<el-button icon="delete" size="small" @click="del" type="danger" :plain="true">删除</el-button>
 					<el-button size="small" @click="exp">导出</el-button>
 					<el-button size="small" @click="showFieldsDialog">字段配置</el-button>
+					<el-button size="small" @click="downloadCode">下载代码</el-button>
 				</el-col>
 				<el-col :span="1" offset="3">
 					<div class="float-right">
@@ -158,18 +159,18 @@ ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnoti
 				<el-form ref="fieldDetailForm" :rules="fieldDetailFormRules" :model="fieldDetailForm" label-width="80px">
 					
 					<el-row>
-						<el-col :span="6">
+						<el-col :span="5">
 							<el-form-item label="字段名称" prop="name"> 
 								<el-input v-model="fieldDetailForm.name" size="small" placeholder="请输入字段名称"></el-input>
 							</el-form-item>
 						</el-col>
-						<el-col :span="6">
+						<el-col :span="5">
 							<el-form-item label="代码名称" prop="codeName"> 
 								<el-input v-model="fieldDetailForm.codeName" size="small" placeholder="请输入代码名称"></el-input>
 							</el-form-item>
 						</el-col>
 						
-						<el-col :span="6">
+						<el-col :span="5">
 							<el-form-item label="数据类型" prop="dataType">
 								<el-select size="small" v-model="fieldDetailForm.dataType" placeholder="请选择">
 									<el-option label="String" value="String"></el-option>
@@ -184,7 +185,7 @@ ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnoti
 							</el-form-item>
 						</el-col>
 						
-						<el-col :span="6">
+						<el-col :span="5">
 							<el-form-item label="表单类型" prop="inputType">
 								<el-select size="small" v-model="fieldDetailForm.inputType" placeholder="请选择">
 									<el-option label="text" value="text"></el-option>
@@ -194,6 +195,12 @@ ${jsContext}${appJs}${jquery}${bootstrap}${jqueryUI}${jqGrid}${vue}${ele}${pnoti
 									<el-option label="date" value="date"></el-option>
 									<el-option label="textarea" value="textarea"></el-option>
 								</el-select>
+							</el-form-item>
+						</el-col>
+						
+						<el-col :span="4">
+							<el-form-item label="是否搜索">
+								<el-switch on-text="是" off-text="否" v-model="fieldDetailForm.isSearch"></el-switch> 
 							</el-form-item>
 						</el-col>
 					</el-row>

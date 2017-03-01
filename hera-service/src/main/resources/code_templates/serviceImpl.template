@@ -1,0 +1,16 @@
+package #rootPackage#.service.impl;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import #rootPackage#.domain.#domain#;
+import #rootPackage#.service.#domain#Service;
+import org.apel.gaia.infrastructure.impl.AbstractBizCommonService;
+
+@Service
+@Transactional
+public class #domain#ServiceImpl extends AbstractBizCommonService<#domain#, String> implements #domain#Service{
+
+	
+
+}

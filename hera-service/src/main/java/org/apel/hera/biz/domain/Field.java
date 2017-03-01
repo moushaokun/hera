@@ -34,6 +34,8 @@ public class Field {
 	private String moduleId;
 
 	private String mark;
+	
+	private Boolean isSearch;
 
 	public String getId() {
 		return id;
@@ -89,6 +91,14 @@ public class Field {
 
 	public void setModuleId(String moduleId) {
 		this.moduleId = moduleId;
+	}
+
+	public Boolean getIsSearch() {
+		return isSearch;
+	}
+
+	public void setIsSearch(Boolean isSearch) {
+		this.isSearch = isSearch;
 	}
 
 }

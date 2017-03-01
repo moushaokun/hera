@@ -1,0 +1,38 @@
+package #rootPackage#.domain;
+
+import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+#importPackage#
+
+@Entity
+@Table(name = "#tableName#")
+public class #domain# {
+
+	@Id
+	private String id;
+
+	private Date createDate;
+	
+#fields#
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+	
+#fieldMethods#
+}

@@ -3,6 +3,7 @@ package org.apel.hera.biz.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.List;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
@@ -14,11 +15,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apel.gaia.util.UUIDUtil;
 import org.apel.hera.biz.consist.FileConsist;
 import org.apel.hera.biz.domain.DBParams;
+import org.apel.hera.biz.domain.Domain;
+import org.apel.hera.biz.domain.Field;
+import org.apel.hera.biz.domain.JavaCoreParam;
 import org.apel.hera.biz.domain.Project;
 import org.apel.hera.biz.domain.ProjectParam;
 import org.apel.hera.biz.domain.SettingsConfigParam;
 import org.apel.hera.biz.domain.TemplateParam;
 import org.apel.hera.biz.util.CodeIOUtil;
+import org.apel.hera.biz.util.CodePropertyUtil;
 
 /**
  * 枚举抽象策略模式，代码机器人核心
@@ -276,6 +281,121 @@ public enum CodeGenerationPolicy {
 				return value;
 			}, projectParam.getPath(), exportName);
 			return null;
+		}
+		
+	},
+	/**
+	 * 实体领域对象java类产生
+	 */
+	DOMAIN_TEMPLATE(JavaCoreParam.DOMAIN_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
+			Domain d = javaCoreParam.getDomain();
+			List<Field> fields = javaCoreParam.getFields();
+			String[] handledInfo = CodePropertyUtil.handleCodeJavaProperty(fields);
+			String fieldsStr = handledInfo[0];
+			String fieldMethodsStr = handledInfo[1];
+			String importPackagesStr = handledInfo[2];
+			return CodeIOUtil.generateSourceBytes(toString(), value -> {
+				value = value.replaceAll(JavaCoreParam.IMPORT_PACKAGE, importPackagesStr);
+				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(JavaCoreParam.TABLE_NAME, d.getTableName());
+				value = value.replaceAll(JavaCoreParam.CLASS_NAME, d.getClassName());
+				value = value.replaceAll(JavaCoreParam.FIELDS, fieldsStr);
+				value = value.replaceAll(JavaCoreParam.FIELD_METHODS, fieldMethodsStr);
+				return value;
+			});
+		}
+		
+	},
+	/**
+	 * java service接口产生
+	 */
+	SERVICE_TEMPLATE(JavaCoreParam.SERVICE_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
+			Domain d = javaCoreParam.getDomain();
+			return CodeIOUtil.generateSourceBytes(toString(), value -> {
+				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(JavaCoreParam.CLASS_NAME, d.getClassName());
+				return value;
+			});
+		}
+		
+	},
+	/**
+	 * java service接口实现类产生
+	 */
+	SERVICE_IMPL_TEMPLATE(JavaCoreParam.SERVICE_IMPL_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
+			Domain d = javaCoreParam.getDomain();
+			return CodeIOUtil.generateSourceBytes(toString(), value -> {
+				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(JavaCoreParam.CLASS_NAME, d.getClassName());
+				return value;
+			});
+		}
+		
+	},
+	/**
+	 * java dao产生
+	 */
+	REPOSITORY_TEMPLATE(JavaCoreParam.REPOSITORY_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
+			Domain d = javaCoreParam.getDomain();
+			return CodeIOUtil.generateSourceBytes(toString(), value -> {
+				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(JavaCoreParam.CLASS_NAME, d.getClassName());
+				return value;
+			});
+		}
+		
+	},
+	/**
+	 * java controller产生
+	 */
+	CONTROLLER_TEMPLATE(JavaCoreParam.CONTROLLER_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
+			Domain d = javaCoreParam.getDomain();
+			String className = d.getClassName();
+			String domainName = String.valueOf(Character.toLowerCase(className.charAt(0))) + className.substring(1, className.length());
+			return CodeIOUtil.generateSourceBytes(toString(), value -> {
+				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(JavaCoreParam.CLASS_NAME, className);
+				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, domainName);
+				return value;
+			});
+		}
+		
+	},
+	/**
+	 * i18n产生
+	 */
+	I18N_TEMPLATE(JavaCoreParam.I18N_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
+			Domain d = javaCoreParam.getDomain();
+			String className = d.getClassName();
+			String domainName = String.valueOf(Character.toLowerCase(className.charAt(0))) + className.substring(1, className.length());
+			return CodeIOUtil.generateSourceBytes(toString(), value -> {
+				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, domainName);
+				return value;
+			});
 		}
 		
 	};
