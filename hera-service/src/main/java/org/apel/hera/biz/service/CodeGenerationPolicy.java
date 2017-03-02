@@ -201,7 +201,7 @@ public enum CodeGenerationPolicy {
 			Project project = projectParam.getProject();
 			CodeIOUtil.generateSourceFile(toString(), value -> {
 				value = value.replaceAll(StableCharConsist.WEB_PORT, project.getWebPort());
-				value = value.replaceAll(StableCharConsist.CONTEXT_PATH, project.getContextPath());
+				value = value.replaceAll(StableCharConsist.CONTEXT_PATH, "/" + project.getContextPath());
 				return value;
 			}, projectParam.getPath(), SystemConsist.PROJECT_APPLICATION_PROPERTIES);
 			return null;
