@@ -233,6 +233,14 @@ $(function(){
 				}
 				var ids = grid.jqGrid ('getGridParam', 'selarrrow');
 		    	PlatformUI.simulateSubmitForm(contextPath + "/project/downloadProjectScaffold", {projectId: ids[0]}, "post");
+		    },
+		    downloadCode: function(){
+		    	var ids = grid.jqGrid ('getGridParam', 'selarrrow');
+				if(ids.length != 1){
+					PlatformUI.message({message:"请选择一条要操作的数据!", type:"warning"});
+					return;
+				}
+				PlatformUI.simulateSubmitForm(contextPath + "/project/downloadCode", {projectId: ids[0]}, "post");
 		    }
 		}
 	});

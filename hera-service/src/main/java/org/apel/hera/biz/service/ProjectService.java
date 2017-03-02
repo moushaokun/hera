@@ -11,5 +11,7 @@ public interface ProjectService extends BizCommonService<Project, String>{
 	 * @return 脚手架zip
 	 */
 	byte[] generateProjectScaffold(String projectId);
+
+	byte[] downloadCodeZip(String projectId);
 	
 }

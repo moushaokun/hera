@@ -111,7 +111,7 @@ public class SimpleModuleController {
 	
 	//实体代码下载
 	@RequestMapping(value = "/downloadCode", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<byte[]> downloadProjectScaffold(String domainId){
+	public @ResponseBody ResponseEntity<byte[]> downloadCode(String domainId){
 		return ExportUtil.getResponseEntityByFile(domainService.downloadCodeZip(domainId), "代码文件.zip");
 	}
 	

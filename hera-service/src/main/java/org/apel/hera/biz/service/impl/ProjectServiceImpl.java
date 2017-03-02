@@ -102,5 +102,37 @@ public class ProjectServiceImpl extends AbstractBizCommonService<Project, String
 		return zipBytes;
 	}
 
+
+
+	@Override
+	public byte[] downloadCodeZip(String projectId) {
+		String tempKey = UUIDUtil.uuid();
+		String exportRootPath = System.getProperty("user.dir") + "/tmp/" + tempKey;
+		File tempDir = new File(System.getProperty("user.dir") + "/tmp/" + tempKey);
+		String zipPath = System.getProperty("user.dir") + "/tmp/" + tempKey + ".zip";
+		List<Domain> domains = domainService.findByProjectId(projectId);
+		for (Domain domain : domains) {
+			domainService.generateCode(domain.getId(), exportRootPath);
+		}
+		//压缩
+		byte[] zipBytes = null;
+		try {
+			ZipFile zipFile = new ZipFile(zipPath);
+			ZipParameters parameters = new ZipParameters();  
+			parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);  
+			parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+			zipFile.addFolder(tempDir, parameters);//将临时文件进行zip压缩
+			try (FileInputStream zipIs = new FileInputStream(zipPath);){
+				zipBytes = IOUtils.toByteArray(zipIs);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		FileUtils.deleteQuietly(new File(zipPath));
+		FileUtils.deleteQuietly(tempDir);
+		return zipBytes;
+	}
+
 	
 }

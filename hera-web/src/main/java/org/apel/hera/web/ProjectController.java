@@ -133,4 +133,10 @@ public class ProjectController {
 		return ExportUtil.getResponseEntityByFile(projectService.generateProjectScaffold(projectId), FileConsist.threadExportName.get());
 	}
 	
+	//实体代码下载
+	@RequestMapping(value = "/downloadCode", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<byte[]> downloadCode(String projectId){
+		return ExportUtil.getResponseEntityByFile(projectService.downloadCodeZip(projectId), "代码文件.zip");
+	}
+	
 }
