@@ -16,7 +16,7 @@ $(function(){
 				},//top工具form数据
 				form: #formFieldsJson#,
 		        formRules: {
-		        	#validateRules#
+#validateRules#
 		        },
 		        dialogFormVisible: false,//dialog是否显示
 		        formEdit: false,
@@ -62,7 +62,7 @@ $(function(){
 					url: contextPath + "/#domainName#/" + ids[0],
 					afterOperation: function(data, textStatus,jqXHR){
 						delete data.createDate;
-						#dateFieldsToDate#
+#dateFieldsToDate#
 						context.form = $.extend(context.form, data);
 					}
 				});
@@ -102,7 +102,7 @@ $(function(){
         		this.$refs['form'].validate(function(valid){
         			if (valid) {
         				var data = $.extend({}, context.form);
-        				#dateFieldsToStr#
+#dateFieldsToStr#
         				var actionUrl = contextPath + "/#domainName#";
         				if(context.formEdit){
         					actionUrl = contextPath + "/#domainName#/" + data.id;
@@ -162,7 +162,7 @@ $(function(){
         multiselect: true,
         colNames: #jqGridColNames#,
         colModel: [
-			#jqGridColModel#
+#jqGridColModel#
         ],
         pager: "#pager",
         rowNum: 10,
@@ -172,7 +172,7 @@ $(function(){
         viewrecords: true,
         gridview: true,
         autoencode: true,
-        caption: "员工列表",
+        caption: "列表",
     	gridComplete: function(){
     		PlatformUI.fineTuneGridSize(grid, 42);
     		//设置隐藏/显示列字段

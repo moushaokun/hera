@@ -14,11 +14,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apel.gaia.util.UUIDUtil;
+import org.apel.hera.biz.consist.DataTypeConsist;
 import org.apel.hera.biz.consist.FileConsist;
 import org.apel.hera.biz.consist.InputTypeConsist;
 import org.apel.hera.biz.domain.DBParams;
 import org.apel.hera.biz.domain.Domain;
 import org.apel.hera.biz.domain.Field;
+import org.apel.hera.biz.domain.FieldValidateRule;
 import org.apel.hera.biz.domain.JavaCoreParam;
 import org.apel.hera.biz.domain.ModuleRowColumn;
 import org.apel.hera.biz.domain.Project;
@@ -413,72 +415,167 @@ public enum CodeGenerationPolicy {
 			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
 			Domain d = javaCoreParam.getDomain();
 			List<Field> fields = javaCoreParam.getFields();
-			String className = d.getClassName();
-			String domainName = String.valueOf(Character.toLowerCase(className.charAt(0))) + className.substring(1, className.length());
-			//搜索框html
+			//搜索框html字符串生成
 			StringBuffer searchFieldsSb = new StringBuffer("");
 			for (int i = 0; i < fields.size(); i++) {
 				Field field = fields.get(i);
 				if(field.getIsSearch() != null && field.getIsSearch()){
-					searchFieldsSb.append("\t\t\t\t\t\t\t\t<el-option label=\"" + field.getName() + "\" value=\"" + field.getCodeName() + "\"></el-option>\n");
+					searchFieldsSb.append(InputTypeConsist.HTML_SEARCH_OPTION_TEMPLATE
+							.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDNAME, field.getName())
+							.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDCODENAME, field.getCodeName()));
 				}
 			}
 			String searchFields = searchFieldsSb.toString();
-			//表单html
+			//表单html字符串生成
 			StringBuffer formFieldStr = new StringBuffer();
 			List<ModuleRowColumn> rowCols = d.getRowCols();
 			if(!CollectionUtils.isEmpty(rowCols)){
 				for (int i = 0; i < rowCols.size(); i++) {
 					ModuleRowColumn rowCol = rowCols.get(i);
 					StringBuffer rowHtml = new StringBuffer();
-					rowHtml.append("\t\t\t\t<el-row>\n");
+					rowHtml.append(InputTypeConsist.HTML_ROW_START_TEMPLATE);
 					Integer colNum = rowCol.getColNum();
 					int maxColNum = 24;
 					if(colNum == 5){
 						maxColNum += 1;
 					}
+					//计算span
 					int span = maxColNum / colNum;
 					for (int j = 0; j < colNum; j++) {
 						if(colNum == 5 && (j == colNum - 1)){
 							span = span - 1;
 						}
+						//根据行列坐标查找字段
 						Field field = findFieldsByRowAndColIndex(fields, i, j);
 						String colHtml = "";
 						if(field != null){//根据行列坐标查找字段，如果找到根据字段信息渲染html
-							colHtml = "\t\t\t\t\t<el-col :span=\"#span#\">\n\t\t\t\t\t\t<el-form-item label=\"#fieldName#\" prop=\"#fieldCodeName#\">\n#formInput#\t\t\t\t\t\t</el-form-item>\n\t\t\t\t\t</el-col>\n";
-							String formInput = "";
-							if(field.getInputType().equals(InputTypeConsist.PASSWORD)){
-								formInput = "\t\t\t\t\t\t\t<el-input v-model=\"form.#fieldCodeName#\" type=\"password\" size=\"small\" placeholder=\"请输入#fieldName#\"></el-input>\n";
-							}else if(field.getInputType().equals(InputTypeConsist.SELECT)){
-								formInput = "\t\t\t\t\t\t\t<el-select size=\"small\" v-model=\"form.#fieldCodeName#\" placeholder=\"请选择\">\n\t\t\t\t\t\t\t\t<el-option label=\"选项一\" value=\"选项一\"></el-option>\n\t\t\t\t\t\t\t</el-select>\n";
-							}else if(field.getInputType().equals(InputTypeConsist.SWITCH)){
-								formInput = "\t\t\t\t\t\t\t<el-switch on-text=\"是\" off-text=\"否\" v-model=\"form.#fieldCodeName#\"></el-switch>\n";
-							}else if(field.getInputType().equals(InputTypeConsist.DATE)){
-								formInput = "\t\t\t\t\t\t\t<el-date-picker size=\"small\" v-model=\"form.#fieldCodeName#\" type=\"datetime\" placeholder=\"选择日期\"></el-date-picker>\n";
-							}else if(field.getInputType().equals(InputTypeConsist.TEXTAREA)){
-								formInput = "\t\t\t\t\t\t\t<el-input v-model=\"form.#fieldCodeName#\" type=\"textarea\" size=\"small\" placeholder=\"请输入#fieldName#\"></el-input>\n";
-							}else if(field.getInputType().equals(InputTypeConsist.NUMBER)){
-								formInput = "\t\t\t\t\t\t\t<el-input-number size=\"small\" v-model=\"form.#fieldCodeName#\" :min=\"0\"></el-input-number>\n";
-							}else{
-								formInput = "\t\t\t\t\t\t\t<el-input v-model=\"form.#fieldCodeName#\" size=\"small\" placeholder=\"请输入#fieldName#\"></el-input>\n";
-							}
-							colHtml = colHtml.replaceAll("#formInput#", formInput).replaceAll("#span#", String.valueOf(span))
-									.replaceAll("#fieldName#", field.getName()).replaceAll("#fieldCodeName#", field.getCodeName());
-						}else{//没有找到添加空
-							colHtml = "\t\t\t\t\t<el-col :span=\"" + span + "\"></el-col>\n";
+							colHtml = InputTypeConsist.html_COL_TEMPLATE;
+							//根据字段的input类型生成对应的html标签
+							String formInput = InputTypeConsist.get(field.getInputType()).createFormInput();
+							colHtml = colHtml.replaceAll(InputTypeConsist.PLACEHOLDER_FORMINPUT, formInput).replaceAll(InputTypeConsist.PLACEHOLDER_SPAN, String.valueOf(span))
+									.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDNAME, field.getName()).replaceAll(InputTypeConsist.PLACEHOLDER_FIELDCODENAME, field.getCodeName());
+						}else{//没有找到添加空列
+							colHtml = InputTypeConsist.HTML_EMPTY_COL_TEMPLATE;
+							colHtml = colHtml.replaceAll(InputTypeConsist.PLACEHOLDER_SPAN, String.valueOf(span));
 						}
 						rowHtml.append(colHtml);
 					}
-					rowHtml.append("\t\t\t\t</el-row>\n");
+					rowHtml.append(InputTypeConsist.HTML_ROW_END_TEMPLATE);
 					formFieldStr.append(rowHtml);
 				}
 			}
-			
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
 				value = value.replaceAll(JavaCoreParam.MODULE_NAME, d.getDomainName());
-				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, domainName);
+				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, d.getDomainCodeName());
 				value = value.replaceAll(JavaCoreParam.SEARCH_FIELDS, searchFields);
 				value = value.replaceAll(JavaCoreParam.FORM_FIELDS, formFieldStr.toString());
+				return value;
+			});
+		}
+	},
+	/**
+	 * js文件产生
+	 */
+	JS_TEMPLATE(JavaCoreParam.JS_TEMPLATE){
+
+		@Override
+		public byte[] generateSourceCode(Object templateParam) {
+			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
+			Domain d = javaCoreParam.getDomain();
+			List<Field> fields = javaCoreParam.getFields();
+			StringBuffer formFieldsJsonSb = new StringBuffer();
+			formFieldsJsonSb.append("{");
+			StringBuffer fieldRulesSb = new StringBuffer();
+			StringBuffer dateFieldToDateSb = new StringBuffer();
+			StringBuffer dateFieldsToStrSb = new StringBuffer();
+			StringBuffer jqGridColNamesSb = new StringBuffer();
+			StringBuffer jqGridColModelSb = new StringBuffer();
+			jqGridColNamesSb.append(JavaCoreParam.JQGRID_COL_NAMES_START);
+			jqGridColModelSb.append(JavaCoreParam.JQGRID_COL_MODEL_START);
+			for (int i = 0; i < fields.size(); i++) {
+				Field field = fields.get(i);
+				
+				jqGridColNamesSb.append("'" + field.getName() + "',");
+				
+				String colModelTemplate = "";
+				if(field.getDataType().equals(DataTypeConsist.DATE.toString())){
+					colModelTemplate = JavaCoreParam.JQGRID_COL_MODEL_DATE;
+				}else if(field.getDataType().equals(DataTypeConsist.BOOLEAN.toString())){
+					colModelTemplate = JavaCoreParam.JQGRID_COL_MODEL_BOOLEAN;
+				}else{
+					colModelTemplate = JavaCoreParam.JQGRID_COL_MODEL_COMMON;
+				}
+				jqGridColModelSb.append(colModelTemplate.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDCODENAME, field.getCodeName()));
+				
+				
+				if(field.getDataType().equals(DataTypeConsist.DATE.toString())){
+					dateFieldToDateSb.append(JavaCoreParam.DATE_FIELDS_TO_DATE_TEMPLATE.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDNAME, field.getCodeName()));
+					dateFieldsToStrSb.append(JavaCoreParam.DATE_FIELDS_TO_STR_TEMPLATE.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDNAME, field.getCodeName()));
+				}
+				
+				if(!field.getCodeName().equals("createDate")){
+					formFieldsJsonSb.append(field.getCodeName() + ":");
+					if(field.getDataType().equals(DataTypeConsist.BOOLEAN.toString())){
+						formFieldsJsonSb.append("false,");
+					}else{
+						formFieldsJsonSb.append("null,");
+					}
+				}
+				
+				fieldRulesSb.append(JavaCoreParam.getTabString(5) + field.getCodeName() + ":[\n");
+				List<FieldValidateRule> validateRules = field.getValidateRules();
+				for (int j = 0; j < validateRules.size(); j++) {
+					FieldValidateRule r = validateRules.get(j);
+					if(r.getValidateType().equals("required")){
+						fieldRulesSb.append(JavaCoreParam.getTabString(6) + "{ required: '" + r.getvValue() + "', message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n");
+					}else if(r.getValidateType().equals("range")){
+						String min = "";
+						String max = "";
+						if(StringUtils.isNotEmpty(r.getvValue())){
+							min = r.getvValue().split(",")[0];
+							if( r.getvValue().split(",").length > 1){
+								max = r.getvValue().split(",")[1];
+							}
+						}
+						if(!StringUtils.isEmpty(min)){
+							min = "min:" + min + ",";
+						}
+						if(!StringUtils.isEmpty(max)){
+							max = "max:" + max + ",";
+						}
+						String rangeValidateType = "string";
+						if(field.getDataType().equals(DataTypeConsist.INTEGER.toString()))
+							rangeValidateType = "number";
+						String t = JavaCoreParam.getTabString(6) + "{ #min##max# type:'" + rangeValidateType + "',message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n";
+						fieldRulesSb.append(t.replaceAll("#min#", min).replaceAll("#max#", max));
+					}else if(r.getValidateType().equals("length")){
+						fieldRulesSb.append(JavaCoreParam.getTabString(6) + "{ len:" + r.getvValue() + ", message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n");
+					}else{
+						fieldRulesSb.append(JavaCoreParam.getTabString(6) + "{ type: '" + r.getValidateType() + "', message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n");
+					}
+					if(j == validateRules.size() - 1){
+						fieldRulesSb = new StringBuffer(fieldRulesSb.substring(0, fieldRulesSb.length() - 2) + "\n");
+					}
+				}
+				fieldRulesSb.append(JavaCoreParam.getTabString(5) + "],\n");
+			}
+			jqGridColModelSb.append(JavaCoreParam.JQGRID_COL_MODEL_END);
+			jqGridColNamesSb.append(JavaCoreParam.JQGRID_COL_NAMES_END);
+			String dateFieldToDate = dateFieldToDateSb.toString();
+			String dateFieldToStr = dateFieldsToStrSb.toString();
+			String jqgridColNames = jqGridColNamesSb.toString();
+			String jqGridColModel= jqGridColModelSb.toString();
+			String formFieldsJson = formFieldsJsonSb.substring(0, formFieldsJsonSb.length() - 1) + "}";
+			String fieldRules = fieldRulesSb.substring(0, fieldRulesSb.length() - 2).toString() + "\n";
+			return CodeIOUtil.generateSourceBytes(toString(), value -> {
+				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, d.getDomainCodeName());
+				value = value.replaceAll(JavaCoreParam.TABLE_NAME, d.getTableName());
+				value = value.replaceAll(JavaCoreParam.FORM_FIELDS_JSON, formFieldsJson);
+				value = value.replaceAll(JavaCoreParam.VALIDATE_RULES, fieldRules);
+				value = value.replaceAll(JavaCoreParam.DATE_FIELDS_TO_DATE, dateFieldToDate);
+				value = value.replaceAll(JavaCoreParam.DATE_FIELDS_TO_STR, dateFieldToStr);
+				value = value.replaceAll(JavaCoreParam.JQGRID_COL_NAMES, jqgridColNames);
+				value = value.replaceAll(JavaCoreParam.JQGRID_COL_MODEL, jqGridColModel);
 				return value;
 			});
 		}

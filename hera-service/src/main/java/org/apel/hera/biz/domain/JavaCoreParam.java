@@ -22,7 +22,21 @@ public class JavaCoreParam {
 	public final static String JS_TEMPLATE = "js.template";
 	public final static String SEARCH_FIELDS = "#search_fields#";
 	public final static String FORM_FIELDS = "#form_fields#";
-	
+	public final static String FORM_FIELDS_JSON = "#formFieldsJson#";
+	public final static String VALIDATE_RULES = "#validateRules#";
+	public final static String DATE_FIELDS_TO_DATE = "#dateFieldsToDate#";
+	public final static String DATE_FIELDS_TO_STR = "#dateFieldsToStr#";
+	public final static String JQGRID_COL_NAMES = "#jqGridColNames#";
+	public final static String JQGRID_COL_MODEL = "#jqGridColModel#";
+	public final static String JQGRID_COL_NAMES_START = "['ID',";
+	public final static String JQGRID_COL_NAMES_END = "'创建时间']";
+	public final static String JQGRID_COL_MODEL_START = "\t\t\t{ name: 'id', index:'id',hidden: true},\n";
+	public final static String JQGRID_COL_MODEL_END = "\t\t\t{ name: 'createDate', index:'createDate',align:'center', expType:'date',expValue:'yyyy-MM-dd',searchoptions:{dataInit:PlatformUI.defaultJqueryUIDatePick}, sortable: true ,formatter:'date',formatoptions: { srcformat: 'U', newformat: 'Y-m-d H:i:s' }}";
+	public final static String JQGRID_COL_MODEL_DATE = "\t\t\t{ name: '#fieldCodeName#', index:'#fieldCodeName#',align:'center', expType:'date',expValue:'yyyy-MM-dd',searchoptions:{dataInit:PlatformUI.defaultJqueryUIDatePick}, sortable: true ,formatter:'date',formatoptions: { srcformat: 'U', newformat: 'Y-m-d H:i:s' }},\n";
+	public final static String JQGRID_COL_MODEL_BOOLEAN = "\t\t\t{ name:'#fieldCodeName#', index:'#fieldCodeName#',expType:'boolean',expValue:{'true':'是','false':'否'},align:'center', formatter: PlatformUI.defaultYNFormatter, stype:'select', searchoptions:{value:'true:是;false:否'}},\n";
+	public final static String JQGRID_COL_MODEL_COMMON = "\t\t\t{ name: '#fieldCodeName#', index:'#fieldCodeName#', align:'center', sortable: true},\n";
+	public final static String DATE_FIELDS_TO_DATE_TEMPLATE = "\t\t\t\t\t\tdata.#fieldName# = new Date(data.#fieldName#);\n";
+	public final static String DATE_FIELDS_TO_STR_TEMPLATE = "\t\t\t\t\t\tdata.#fieldName# = ExtendDate.getFormatDateByLong(data.#fieldName#.getTime(), 'yyyy-MM-dd');";
 	
 	private Domain domain;
 
@@ -42,6 +56,14 @@ public class JavaCoreParam {
 
 	public void setFields(List<Field> fields) {
 		this.fields = fields;
+	}
+	
+	public static String getTabString(int num){
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < num; i++) {
+			sb.append("\t");
+		}
+		return sb.toString();
 	}
 
 }

@@ -10,6 +10,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
+
 @Entity
 @Table(name = "robot_domain")
 public class Domain {
@@ -22,6 +24,9 @@ public class Domain {
 	private String className;
 
 	private String tableName;
+	
+	@Transient
+	private String domainCodeName;
 
 	@ManyToOne
 	@JoinColumn(name = "projectId")
@@ -87,5 +92,19 @@ public class Domain {
 	public void setRowCols(List<ModuleRowColumn> rowCols) {
 		this.rowCols = rowCols;
 	}
+
+	public String getDomainCodeName() {
+		if(!StringUtils.isEmpty(this.className)){
+			return String.valueOf(Character.toLowerCase(this.className.charAt(0))) + this.className.substring(1, this.className.length());
+		}else{
+			return null;
+		}
+	}
+
+	public void setDomainCodeName(String domainCodeName) {
+		this.domainCodeName = domainCodeName;
+	}
+	
+	
 
 }

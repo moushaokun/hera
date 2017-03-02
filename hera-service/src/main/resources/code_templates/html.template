@@ -62,19 +62,16 @@
 	  		</el-col>
 		</el-row>
 	
-		<el-dialog title="详细信息" v-model="dialogFormVisible" lock-scroll @close="resetForm">
+		<el-dialog title="详细信息" size="large" v-model="dialogFormVisible" lock-scroll @close="resetForm">
 			<el-form ref="form" :rules="formRules" :model="form" label-width="80px">
 				
 #form_fields#
 				
-				<el-row>
-					<el-col :span="8" offset="8" >
-						<el-button type="primary" size="small" @click="onSubmit">{{submitBtnName}}</el-button>
-						<el-button size="small" @click="resetForm">取消</el-button>  
-					</el-col>
-				</el-row>
-			
 			</el-form> 
+			<div slot="footer" class="dialog-footer">
+				<el-button type="primary" size="small" @click="onSubmit">{{submitBtnName}}</el-button>
+				<el-button size="small" @click="resetForm">取消</el-button>
+			</div>
 		</el-dialog>
 			
 		<el-dialog title="列表显示列" v-model="dialogGridSelectionVisible" lock-scroll>

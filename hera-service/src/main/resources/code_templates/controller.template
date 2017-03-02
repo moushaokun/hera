@@ -29,13 +29,13 @@ public class #domain#Controller {
 	@Autowired
 	private #domain#Service #domainName#Service;
 	
-	//首页
+	//棣栭〉
 	@RequestMapping(value = "index", method = RequestMethod.GET)
 	public String index(){
 		return INDEX_URL;
 	}
 	
-	//列表查询
+	//鍒楄〃鏌ヨ
 	@RequestMapping
 	public @ResponseBody PageBean list(QueryParams queryParams){
 		JqGridUtil.getPageBean(queryParams);
@@ -44,14 +44,14 @@ public class #domain#Controller {
 		return pageBean;
 	}
 	
-	//新增
+	//鏂板
 	@RequestMapping(method = RequestMethod.POST)
 	public @ResponseBody Message create(#domain# #domainName#){
 		#domainName#Service.save(#domainName#);
 		return MessageUtil.message("#domainName#.create.success");
 	}
 	
-	//更新
+	//鏇存柊
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public @ResponseBody Message create(@PathVariable String id, #domain# #domainName#){
 		#domainName#.setId(id);
@@ -59,27 +59,27 @@ public class #domain#Controller {
 		return MessageUtil.message("#domainName#.update.success");
 	}
 	
-	//查看
+	//鏌ョ湅
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public @ResponseBody #domain# view(@PathVariable String id){
 		return #domainName#Service.findById(id);
 	}
 	
-	//删除
+	//鍒犻櫎
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public @ResponseBody Message delete(@PathVariable String id){
 		#domainName#Service.deleteById(id);
 		return MessageUtil.message("#domainName#.delete.success");
 	}
 	
-	//批量删除
+	//鎵归噺鍒犻櫎
 	@RequestMapping(method = RequestMethod.DELETE)
 	public @ResponseBody Message batchDelete(@RequestParam("ids[]") String[] ids){
 		#domainName#Service.deleteById(ids);
 		return MessageUtil.message("#domainName#.delete.success");
 	}
 	
-	//查询全部数据
+	//鏌ヨ鍏ㄩ儴鏁版嵁
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public @ResponseBody List<#domain#> getAll(){
 		return #domainName#Service.findAll(new Sort(Direction.DESC, "createDate"));

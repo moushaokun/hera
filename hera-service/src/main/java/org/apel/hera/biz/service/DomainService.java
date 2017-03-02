@@ -9,4 +9,7 @@ public interface DomainService extends BizCommonService<Domain, String>{
 	
 	List<Domain> findByProjectId(String projectId);
 
+	public void generateCode(String domainId, String rootPath);
+	
+	public byte[] downloadCodeZip(String domainId);
 }

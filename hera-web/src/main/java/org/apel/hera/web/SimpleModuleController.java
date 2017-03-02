@@ -6,6 +6,7 @@ import org.apel.gaia.commons.i18n.Message;
 import org.apel.gaia.commons.i18n.MessageUtil;
 import org.apel.gaia.commons.jqgrid.QueryParams;
 import org.apel.gaia.commons.pager.PageBean;
+import org.apel.gaia.util.ExportUtil;
 import org.apel.gaia.util.jqgrid.JqGridUtil;
 import org.apel.hera.biz.domain.Domain;
 import org.apel.hera.biz.domain.ModuleRowColumn;
@@ -14,6 +15,7 @@ import org.apel.hera.biz.service.ModuleRowColService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,6 +107,12 @@ public class SimpleModuleController {
 	@RequestMapping(value = "/listRowCol")
 	public @ResponseBody List<ModuleRowColumn> listRowCol(String moduleId){
 		return moduleRowColService.findByModuleId(moduleId);
+	}
+	
+	//实体代码下载
+	@RequestMapping(value = "/downloadCode", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<byte[]> downloadProjectScaffold(String domainId){
+		return ExportUtil.getResponseEntityByFile(domainService.downloadCodeZip(domainId), "代码文件.zip");
 	}
 	
 	

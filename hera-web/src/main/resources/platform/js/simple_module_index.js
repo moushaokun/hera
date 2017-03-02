@@ -365,6 +365,7 @@ $(function(){
         				var data = $.extend({}, context.fieldDetailForm);
         				data['mark'] = context.fieldMark;
         				data['moduleId'] = ids[0];
+        				delete data.validateRules;
         				var rowIndex = context.fieldMark.split("-")[0];
         				var colIndex = context.fieldMark.split("-")[1];
         				var actionUrl = contextPath + "/field";
@@ -490,6 +491,7 @@ $(function(){
 					PlatformUI.message({message:"请选择一条要操作的数据!", type:"warning"});
 					return;
 				}
+				PlatformUI.simulateSubmitForm(contextPath + "/simpleModule/downloadCode", {domainId: ids[0]}, "post");
      		}
 		}
 	});

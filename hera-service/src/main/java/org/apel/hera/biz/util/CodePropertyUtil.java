@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apel.hera.biz.domain.Domain;
 import org.apel.hera.biz.domain.Field;
+import org.apel.hera.biz.domain.FieldValidateRule;
 import org.apel.hera.biz.domain.JavaCoreParam;
 import org.apel.hera.biz.domain.ModuleRowColumn;
 import org.apel.hera.biz.domain.Project;
@@ -68,7 +69,7 @@ public class CodePropertyUtil {
 		field.setCodeName("birthday");
 		field.setName("出生日期");
 		field.setDataType("Date");
-		field.setInputType("text");
+		field.setInputType("date");
 		field.setMark("0-1");
 		fields.add(field);
 		Field f2 = new Field();
@@ -90,6 +91,40 @@ public class CodePropertyUtil {
 		rc2.setColNum(2);
 		rowCols.add(rc1);
 		rowCols.add(rc2);
+		
+		List<FieldValidateRule> rules1 = new ArrayList<>();
+		FieldValidateRule r1 = new FieldValidateRule();
+		r1.setErrorMsg("错误1");
+		r1.setValidateTrigger("blur");
+		r1.setValidateType("length");
+		r1.setvValue("8");
+		FieldValidateRule r2 = new FieldValidateRule();
+		r2.setErrorMsg("错误2");
+		r2.setValidateTrigger("change");
+		r2.setValidateType("required");
+		r2.setvValue("true");
+		FieldValidateRule r3 = new FieldValidateRule();
+		r3.setErrorMsg("错误3");
+		r3.setValidateTrigger("change");
+		r3.setValidateType("range");
+		r3.setvValue("3,4");
+		rules1.add(r1);
+		rules1.add(r2);
+		rules1.add(r3);
+		field.setValidateRules(rules1);
+		List<FieldValidateRule> rules2 = new ArrayList<>();
+		FieldValidateRule r4 = new FieldValidateRule();
+		r4.setErrorMsg("错误4");
+		r4.setValidateTrigger("blur");
+		r4.setValidateType("array");
+		FieldValidateRule r5 = new FieldValidateRule();
+		r5.setErrorMsg("错误5");
+		r5.setValidateTrigger("change");
+		r5.setValidateType("date");
+		rules2.add(r4);
+		rules2.add(r5);
+		f2.setValidateRules(rules2);
+		
 		domain.setRowCols(rowCols);
 		param.setFields(fields);
 		param.setDomain(domain);
@@ -105,8 +140,10 @@ public class CodePropertyUtil {
 //		IOUtils.write(data5, new FileOutputStream("D:/PersonController.java"));
 //		byte[] data6 = CodeGenerationPolicy.I18N_TEMPLATE.generateSourceCode(param);
 //		IOUtils.write(data6, new FileOutputStream("D:/person_zh_CN.properties"));
-		byte[] data6 = CodeGenerationPolicy.HTML_TEMPLATE.generateSourceCode(param);
-		IOUtils.write(data6, new FileOutputStream("D:/1.html"));
+//		byte[] data6 = CodeGenerationPolicy.HTML_TEMPLATE.generateSourceCode(param);
+		byte[] bytes = CodeGenerationPolicy.JS_TEMPLATE.generateSourceCode(param);
+		IOUtils.write(bytes, new FileOutputStream("D:/1.js"));
+		
 	}
 	
 	
