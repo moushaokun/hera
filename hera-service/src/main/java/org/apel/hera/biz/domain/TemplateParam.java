@@ -10,6 +10,5 @@ package org.apel.hera.biz.domain;
  */
 public class TemplateParam {
 
-	public static final String CONSOLE_SCAFFOLD_PACKAGE_NAME = "#packageName#";
 	
 }

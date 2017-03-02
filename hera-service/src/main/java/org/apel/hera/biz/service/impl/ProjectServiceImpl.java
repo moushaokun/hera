@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apel.gaia.infrastructure.impl.AbstractBizCommonService;
 import org.apel.gaia.util.UUIDUtil;
-import org.apel.hera.biz.consist.FileConsist;
+import org.apel.hera.biz.consist.SystemConsist;
 import org.apel.hera.biz.domain.Domain;
 import org.apel.hera.biz.domain.Project;
 import org.apel.hera.biz.domain.ProjectParam;
@@ -58,7 +58,7 @@ public class ProjectServiceImpl extends AbstractBizCommonService<Project, String
 		}
 		byte[] zipBytes = null;
 		try {
-			FileUtils.copyDirectory(new File(FileConsist.CODE_TEMPLATE_LOCAL_PATH + "/project"), exportProjectDir);
+			FileUtils.copyDirectory(new File(SystemConsist.CODE_TEMPLATE_LOCAL_PATH + "/project"), exportProjectDir);
 			ProjectParam projectParam = new ProjectParam();
 			projectParam.setProject(project);
 			//产生pom.xml
@@ -98,7 +98,7 @@ public class ProjectServiceImpl extends AbstractBizCommonService<Project, String
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		FileConsist.threadExportName.set(tempKey + ".zip");
+		SystemConsist.threadExportName.set(tempKey + ".zip");
 		return zipBytes;
 	}
 

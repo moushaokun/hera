@@ -15,8 +15,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apel.gaia.util.UUIDUtil;
 import org.apel.hera.biz.consist.DataTypeConsist;
-import org.apel.hera.biz.consist.FileConsist;
 import org.apel.hera.biz.consist.InputTypeConsist;
+import org.apel.hera.biz.consist.StableCharConsist;
+import org.apel.hera.biz.consist.SystemConsist;
 import org.apel.hera.biz.domain.DBParams;
 import org.apel.hera.biz.domain.Domain;
 import org.apel.hera.biz.domain.Field;
@@ -26,7 +27,6 @@ import org.apel.hera.biz.domain.ModuleRowColumn;
 import org.apel.hera.biz.domain.Project;
 import org.apel.hera.biz.domain.ProjectParam;
 import org.apel.hera.biz.domain.SettingsConfigParam;
-import org.apel.hera.biz.domain.TemplateParam;
 import org.apel.hera.biz.util.CodeIOUtil;
 import org.apel.hera.biz.util.CodePropertyUtil;
 import org.springframework.util.CollectionUtils;
@@ -41,7 +41,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 *	mvn settins配置文件生成
 	 */
-	SETTINGS_TEMPLATE(FileConsist.SETTINGS_TPL_NAME) {
+	SETTINGS_TEMPLATE(SystemConsist.SETTINGS_TPL_NAME) {
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
 			SettingsConfigParam settingsConfigParam = (SettingsConfigParam)templateParam;
@@ -66,12 +66,12 @@ public enum CodeGenerationPolicy {
 				if(StringUtils.isEmpty(jdkVersion)){
 					jdkVersion = SettingsConfigParam.JDK_VERSION_18;
 				}
-				value = value.replaceAll(SettingsConfigParam.REPO_LOCATION, settingsConfigParam.getRepositoryLocation());
-				value = value.replaceAll(SettingsConfigParam.NEXUS_USER_NAME, nexusUsername);
-				value = value.replaceAll(SettingsConfigParam.NEXUS_PASSWORD, nexusPassword);
-				value = value.replaceAll(SettingsConfigParam.NEXUS_RELEASE_ADDRESS, nexusReleaseAddress);
-				value = value.replaceAll(SettingsConfigParam.NEXUS_SNAPSHOT_ADDRESS, nexusSnapshotAddress);
-				value = value.replaceAll(SettingsConfigParam.JDK_VERSION, jdkVersion);
+				value = value.replaceAll(StableCharConsist.REPO_LOCATION, settingsConfigParam.getRepositoryLocation());
+				value = value.replaceAll(StableCharConsist.NEXUS_USER_NAME, nexusUsername);
+				value = value.replaceAll(StableCharConsist.NEXUS_PASSWORD, nexusPassword);
+				value = value.replaceAll(StableCharConsist.NEXUS_RELEASE_ADDRESS, nexusReleaseAddress);
+				value = value.replaceAll(StableCharConsist.NEXUS_SNAPSHOT_ADDRESS, nexusSnapshotAddress);
+				value = value.replaceAll(StableCharConsist.JDK_VERSION, jdkVersion);
 				return value;
 			});
 			return bytes;
@@ -80,7 +80,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * spring boot application.properties文件生成
 	 */
-	BOOT_CONFIG(FileConsist.BOOT_TPL_NAME){
+	BOOT_CONFIG(SystemConsist.BOOT_TPL_NAME){
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
 			return CodeIOUtil.generateSourceBytes(toString(), value -> value);
@@ -89,7 +89,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * db.properties文件生成
 	 */
-	DB_CONFIG(FileConsist.DB_TPL_NAME){
+	DB_CONFIG(SystemConsist.DB_TPL_NAME){
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
 			DBParams dbParams = (DBParams)templateParam;
@@ -142,8 +142,8 @@ public enum CodeGenerationPolicy {
 				sb.append("dialect=" + dbParams.getDialect() + "\n");
 			}
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
-				value = value.replaceAll(DBParams.CONNECTION_CONFIG, connectionConfig);
-				value = value.replaceAll(DBParams.DRUID_CONFIG, sb.toString());
+				value = value.replaceAll(StableCharConsist.CONNECTION_CONFIG, connectionConfig);
+				value = value.replaceAll(StableCharConsist.DRUID_CONFIG, sb.toString());
 				return value;
 			});
 		}
@@ -151,7 +151,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * 控制台脚手架生成
 	 */
-	CONSOLE_SKETCH(FileConsist.CONSOLE_ZIP_NAME){
+	CONSOLE_SKETCH(SystemConsist.CONSOLE_ZIP_NAME){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
@@ -162,14 +162,14 @@ public enum CodeGenerationPolicy {
 			String tmpKey = UUIDUtil.uuid();
 			String tmpDir = localTmpPath + "/" + tmpKey;//在tmp下随机产生的临时文件夹
 			String exportZipName = tmpKey + ".zip";
-			FileConsist.threadExportName.set(exportZipName);
+			SystemConsist.threadExportName.set(exportZipName);
 			File exportZipFile = new File(localTmpPath + exportZipName);
 			try {
 				//产生Controller文件
-				CodeIOUtil.generateSourceFile(FileConsist.CONSOLE_CONTROLLER_TPL_NAME, value -> {
-					value = value.replace(TemplateParam.CONSOLE_SCAFFOLD_PACKAGE_NAME, packageName);
+				CodeIOUtil.generateSourceFile(SystemConsist.CONSOLE_CONTROLLER_TPL_NAME, value -> {
+					value = value.replace(StableCharConsist.PACKAGE_NAME, packageName);
 					return value;
-				}, tmpDir, FileConsist.CONSOLE_CONTROLLER_NAME);
+				}, tmpDir, SystemConsist.CONSOLE_CONTROLLER_NAME);
 				ZipFile zipFile = new ZipFile(exportZipFile);
 				ZipParameters parameters = new ZipParameters();  
 				parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);  
@@ -193,17 +193,17 @@ public enum CodeGenerationPolicy {
 	/**
 	 * 工程的application properties
 	 */
-	PROJECT_APPLICATION_PROPERTIES(ProjectParam.PROJECT_APPLICATION_PROPERTIES_TEMPLATE){
+	PROJECT_APPLICATION_PROPERTIES(SystemConsist.PROJECT_APPLICATION_PROPERTIES_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
 			ProjectParam projectParam = (ProjectParam)templateParam;
 			Project project = projectParam.getProject();
 			CodeIOUtil.generateSourceFile(toString(), value -> {
-				value = value.replaceAll(ProjectParam.WEB_PORT, project.getWebPort());
-				value = value.replaceAll(ProjectParam.CONTEXT_PATH, project.getContextPath());
+				value = value.replaceAll(StableCharConsist.WEB_PORT, project.getWebPort());
+				value = value.replaceAll(StableCharConsist.CONTEXT_PATH, project.getContextPath());
 				return value;
-			}, projectParam.getPath(), ProjectParam.PROJECT_APPLICATION_PROPERTIES);
+			}, projectParam.getPath(), SystemConsist.PROJECT_APPLICATION_PROPERTIES);
 			return null;
 		}
 		
@@ -211,7 +211,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * 工程的center properties
 	 */
-	PROJECT_CENTER_PROPERTIES(ProjectParam.PROJECT_CENTER_PROPERTIES_TEMPLATE){
+	PROJECT_CENTER_PROPERTIES(SystemConsist.PROJECT_CENTER_PROPERTIES_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
@@ -221,11 +221,11 @@ public enum CodeGenerationPolicy {
 			String casUrl = StringUtils.isEmpty(project.getCasUrl()) ? "" : project.getCasUrl();
 			String zkUrl = StringUtils.isEmpty(project.getZookeeperUrl()) ? "" : project.getZookeeperUrl();
 			CodeIOUtil.generateSourceFile(toString(), value -> {
-				value = value.replaceAll(ProjectParam.APP_ID, appId);
-				value = value.replaceAll(ProjectParam.CAS_URL, casUrl);
-				value = value.replaceAll(ProjectParam.ZK_URL, zkUrl);
+				value = value.replaceAll(StableCharConsist.APP_ID, appId);
+				value = value.replaceAll(StableCharConsist.CAS_URL, casUrl);
+				value = value.replaceAll(StableCharConsist.ZK_URL, zkUrl);
 				return value;
-			}, projectParam.getPath(), ProjectParam.PROJECT_CENTER_PROPERTIES);
+			}, projectParam.getPath(), SystemConsist.PROJECT_CENTER_PROPERTIES);
 			return null;
 		}
 		
@@ -233,22 +233,22 @@ public enum CodeGenerationPolicy {
 	/**
 	 * 工程的pom properties
 	 */
-	PROJECT_POM(ProjectParam.PROJECT_POM_TEMPLATE){
+	PROJECT_POM(SystemConsist.PROJECT_POM_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
 			ProjectParam projectParam = (ProjectParam)templateParam;
 			Project project = projectParam.getProject();
 			CodeIOUtil.generateSourceFile(toString(), value -> {
-				value = value.replaceAll(ProjectParam.MVN_VERSION, project.getMvnVersion());
-				value = value.replaceAll(ProjectParam.ARTIFACT_ID, project.getArtifactId());
+				value = value.replaceAll(StableCharConsist.MVN_VERSION, project.getMvnVersion());
+				value = value.replaceAll(StableCharConsist.ARTIFACT_ID, project.getArtifactId());
 				if(!StringUtils.isEmpty(project.getAppId())){
-					value = value.replaceAll(ProjectParam.CAS_INTEGRATE, ProjectParam.CAS_INTEGRATE_VALUE);
+					value = value.replaceAll(StableCharConsist.CAS_INTEGRATE, StableCharConsist.CAS_INTEGRATE_VALUE);
 				}else{
-					value = value.replaceAll(ProjectParam.CAS_INTEGRATE, "");
+					value = value.replaceAll(StableCharConsist.CAS_INTEGRATE, "");
 				}
 				return value;
-			}, projectParam.getPath(), ProjectParam.PROJECT_POM);
+			}, projectParam.getPath(), SystemConsist.PROJECT_POM);
 			return null;
 		}
 		
@@ -256,7 +256,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * 工程的spring配置文件(不集成cas)
 	 */
-	PROJECT_SIMPLE_SPRING(ProjectParam.PROJECT_SIMPLE_SPRING_TEMPLATE){
+	PROJECT_SIMPLE_SPRING(SystemConsist.PROJECT_SIMPLE_SPRING_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
@@ -264,7 +264,7 @@ public enum CodeGenerationPolicy {
 			Project project = projectParam.getProject();
 			String exportName = "module-" + project.getArtifactId() + ".xml";
 			CodeIOUtil.generateSourceFile(toString(), value -> {
-				value = value.replaceAll(ProjectParam.PACKAGE_NAME, project.getPackageName());
+				value = value.replaceAll(StableCharConsist.PACKAGE_NAME, project.getPackageName());
 				return value;
 			}, projectParam.getPath(), exportName);
 			return null;
@@ -274,7 +274,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * 工程的spring配置文件(集成cas)
 	 */
-	PROJECT_SPRING(ProjectParam.PROJECT_SPRING_TEMPLATE){
+	PROJECT_SPRING(SystemConsist.PROJECT_SPRING_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
@@ -282,8 +282,8 @@ public enum CodeGenerationPolicy {
 			Project project = projectParam.getProject();
 			String exportName = "module-" + project.getArtifactId() + ".xml";
 			CodeIOUtil.generateSourceFile(toString(), value -> {
-				value = value.replaceAll(ProjectParam.PACKAGE_NAME, project.getPackageName());
-				value = value.replaceAll(ProjectParam.ARTIFACT_ID, project.getArtifactId());
+				value = value.replaceAll(StableCharConsist.PACKAGE_NAME, project.getPackageName());
+				value = value.replaceAll(StableCharConsist.ARTIFACT_ID, project.getArtifactId());
 				return value;
 			}, projectParam.getPath(), exportName);
 			return null;
@@ -293,7 +293,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * 实体领域对象java类产生
 	 */
-	DOMAIN_TEMPLATE(JavaCoreParam.DOMAIN_TEMPLATE){
+	DOMAIN_TEMPLATE(SystemConsist.DOMAIN_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
@@ -305,12 +305,12 @@ public enum CodeGenerationPolicy {
 			String fieldMethodsStr = handledInfo[1];
 			String importPackagesStr = handledInfo[2];
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
-				value = value.replaceAll(JavaCoreParam.IMPORT_PACKAGE, importPackagesStr);
-				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
-				value = value.replaceAll(JavaCoreParam.TABLE_NAME, d.getTableName());
-				value = value.replaceAll(JavaCoreParam.CLASS_NAME, d.getClassName());
-				value = value.replaceAll(JavaCoreParam.FIELDS, fieldsStr);
-				value = value.replaceAll(JavaCoreParam.FIELD_METHODS, fieldMethodsStr);
+				value = value.replaceAll(StableCharConsist.IMPORT_PACKAGE, importPackagesStr);
+				value = value.replaceAll(StableCharConsist.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(StableCharConsist.TABLE_NAME, d.getTableName());
+				value = value.replaceAll(StableCharConsist.CLASS_NAME, d.getClassName());
+				value = value.replaceAll(StableCharConsist.FIELDS, fieldsStr);
+				value = value.replaceAll(StableCharConsist.FIELD_METHODS, fieldMethodsStr);
 				return value;
 			});
 		}
@@ -319,15 +319,15 @@ public enum CodeGenerationPolicy {
 	/**
 	 * java service接口产生
 	 */
-	SERVICE_TEMPLATE(JavaCoreParam.SERVICE_TEMPLATE){
+	SERVICE_TEMPLATE(SystemConsist.SERVICE_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
 			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
 			Domain d = javaCoreParam.getDomain();
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
-				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
-				value = value.replaceAll(JavaCoreParam.CLASS_NAME, d.getClassName());
+				value = value.replaceAll(StableCharConsist.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(StableCharConsist.CLASS_NAME, d.getClassName());
 				return value;
 			});
 		}
@@ -336,15 +336,15 @@ public enum CodeGenerationPolicy {
 	/**
 	 * java service接口实现类产生
 	 */
-	SERVICE_IMPL_TEMPLATE(JavaCoreParam.SERVICE_IMPL_TEMPLATE){
+	SERVICE_IMPL_TEMPLATE(SystemConsist.SERVICE_IMPL_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
 			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
 			Domain d = javaCoreParam.getDomain();
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
-				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
-				value = value.replaceAll(JavaCoreParam.CLASS_NAME, d.getClassName());
+				value = value.replaceAll(StableCharConsist.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(StableCharConsist.CLASS_NAME, d.getClassName());
 				return value;
 			});
 		}
@@ -353,15 +353,15 @@ public enum CodeGenerationPolicy {
 	/**
 	 * java dao产生
 	 */
-	REPOSITORY_TEMPLATE(JavaCoreParam.REPOSITORY_TEMPLATE){
+	REPOSITORY_TEMPLATE(SystemConsist.REPOSITORY_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
 			JavaCoreParam javaCoreParam = (JavaCoreParam)templateParam;
 			Domain d = javaCoreParam.getDomain();
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
-				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
-				value = value.replaceAll(JavaCoreParam.CLASS_NAME, d.getClassName());
+				value = value.replaceAll(StableCharConsist.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(StableCharConsist.CLASS_NAME, d.getClassName());
 				return value;
 			});
 		}
@@ -370,7 +370,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * java controller产生
 	 */
-	CONTROLLER_TEMPLATE(JavaCoreParam.CONTROLLER_TEMPLATE){
+	CONTROLLER_TEMPLATE(SystemConsist.CONTROLLER_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
@@ -379,9 +379,9 @@ public enum CodeGenerationPolicy {
 			String className = d.getClassName();
 			String domainName = String.valueOf(Character.toLowerCase(className.charAt(0))) + className.substring(1, className.length());
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
-				value = value.replaceAll(JavaCoreParam.ROOT_PACKAGE, d.getProject().getPackageName());
-				value = value.replaceAll(JavaCoreParam.CLASS_NAME, className);
-				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, domainName);
+				value = value.replaceAll(StableCharConsist.ROOT_PACKAGE, d.getProject().getPackageName());
+				value = value.replaceAll(StableCharConsist.CLASS_NAME, className);
+				value = value.replaceAll(StableCharConsist.DOMAIN_NAME, domainName);
 				return value;
 			});
 		}
@@ -390,7 +390,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * i18n产生
 	 */
-	I18N_TEMPLATE(JavaCoreParam.I18N_TEMPLATE){
+	I18N_TEMPLATE(SystemConsist.I18N_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
@@ -399,7 +399,7 @@ public enum CodeGenerationPolicy {
 			String className = d.getClassName();
 			String domainName = String.valueOf(Character.toLowerCase(className.charAt(0))) + className.substring(1, className.length());
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
-				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, domainName);
+				value = value.replaceAll(StableCharConsist.DOMAIN_NAME, domainName);
 				return value;
 			});
 		}
@@ -408,7 +408,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * html文件产生
 	 */
-	HTML_TEMPLATE(JavaCoreParam.HTML_TEMPLATE){
+	HTML_TEMPLATE(SystemConsist.HTML_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
@@ -420,9 +420,9 @@ public enum CodeGenerationPolicy {
 			for (int i = 0; i < fields.size(); i++) {
 				Field field = fields.get(i);
 				if(field.getIsSearch() != null && field.getIsSearch()){
-					searchFieldsSb.append(InputTypeConsist.HTML_SEARCH_OPTION_TEMPLATE
-							.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDNAME, field.getName())
-							.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDCODENAME, field.getCodeName()));
+					searchFieldsSb.append(StableCharConsist.HTML_SEARCH_OPTION_TEMPLATE
+							.replaceAll(StableCharConsist.PLACEHOLDER_FIELDNAME, field.getName())
+							.replaceAll(StableCharConsist.PLACEHOLDER_FIELDCODENAME, field.getCodeName()));
 				}
 			}
 			String searchFields = searchFieldsSb.toString();
@@ -433,7 +433,7 @@ public enum CodeGenerationPolicy {
 				for (int i = 0; i < rowCols.size(); i++) {
 					ModuleRowColumn rowCol = rowCols.get(i);
 					StringBuffer rowHtml = new StringBuffer();
-					rowHtml.append(InputTypeConsist.HTML_ROW_START_TEMPLATE);
+					rowHtml.append(StableCharConsist.HTML_ROW_START_TEMPLATE);
 					Integer colNum = rowCol.getColNum();
 					int maxColNum = 24;
 					if(colNum == 5){
@@ -449,26 +449,26 @@ public enum CodeGenerationPolicy {
 						Field field = findFieldsByRowAndColIndex(fields, i, j);
 						String colHtml = "";
 						if(field != null){//根据行列坐标查找字段，如果找到根据字段信息渲染html
-							colHtml = InputTypeConsist.html_COL_TEMPLATE;
+							colHtml = StableCharConsist.html_COL_TEMPLATE;
 							//根据字段的input类型生成对应的html标签
 							String formInput = InputTypeConsist.get(field.getInputType()).createFormInput();
-							colHtml = colHtml.replaceAll(InputTypeConsist.PLACEHOLDER_FORMINPUT, formInput).replaceAll(InputTypeConsist.PLACEHOLDER_SPAN, String.valueOf(span))
-									.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDNAME, field.getName()).replaceAll(InputTypeConsist.PLACEHOLDER_FIELDCODENAME, field.getCodeName());
+							colHtml = colHtml.replaceAll(StableCharConsist.PLACEHOLDER_FORMINPUT, formInput).replaceAll(StableCharConsist.PLACEHOLDER_SPAN, String.valueOf(span))
+									.replaceAll(StableCharConsist.PLACEHOLDER_FIELDNAME, field.getName()).replaceAll(StableCharConsist.PLACEHOLDER_FIELDCODENAME, field.getCodeName());
 						}else{//没有找到添加空列
-							colHtml = InputTypeConsist.HTML_EMPTY_COL_TEMPLATE;
-							colHtml = colHtml.replaceAll(InputTypeConsist.PLACEHOLDER_SPAN, String.valueOf(span));
+							colHtml = StableCharConsist.HTML_EMPTY_COL_TEMPLATE;
+							colHtml = colHtml.replaceAll(StableCharConsist.PLACEHOLDER_SPAN, String.valueOf(span));
 						}
 						rowHtml.append(colHtml);
 					}
-					rowHtml.append(InputTypeConsist.HTML_ROW_END_TEMPLATE);
+					rowHtml.append(StableCharConsist.HTML_ROW_END_TEMPLATE);
 					formFieldStr.append(rowHtml);
 				}
 			}
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
-				value = value.replaceAll(JavaCoreParam.MODULE_NAME, d.getDomainName());
-				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, d.getDomainCodeName());
-				value = value.replaceAll(JavaCoreParam.SEARCH_FIELDS, searchFields);
-				value = value.replaceAll(JavaCoreParam.FORM_FIELDS, formFieldStr.toString());
+				value = value.replaceAll(StableCharConsist.MODULE_NAME, d.getDomainName());
+				value = value.replaceAll(StableCharConsist.DOMAIN_NAME, d.getDomainCodeName());
+				value = value.replaceAll(StableCharConsist.SEARCH_FIELDS, searchFields);
+				value = value.replaceAll(StableCharConsist.FORM_FIELDS, formFieldStr.toString());
 				return value;
 			});
 		}
@@ -476,7 +476,7 @@ public enum CodeGenerationPolicy {
 	/**
 	 * js文件产生
 	 */
-	JS_TEMPLATE(JavaCoreParam.JS_TEMPLATE){
+	JS_TEMPLATE(SystemConsist.JS_TEMPLATE){
 
 		@Override
 		public byte[] generateSourceCode(Object templateParam) {
@@ -490,8 +490,8 @@ public enum CodeGenerationPolicy {
 			StringBuffer dateFieldsToStrSb = new StringBuffer();
 			StringBuffer jqGridColNamesSb = new StringBuffer();
 			StringBuffer jqGridColModelSb = new StringBuffer();
-			jqGridColNamesSb.append(JavaCoreParam.JQGRID_COL_NAMES_START);
-			jqGridColModelSb.append(JavaCoreParam.JQGRID_COL_MODEL_START);
+			jqGridColNamesSb.append(StableCharConsist.JQGRID_COL_NAMES_START);
+			jqGridColModelSb.append(StableCharConsist.JQGRID_COL_MODEL_START);
 			for (int i = 0; i < fields.size(); i++) {
 				Field field = fields.get(i);
 				
@@ -499,18 +499,18 @@ public enum CodeGenerationPolicy {
 				
 				String colModelTemplate = "";
 				if(field.getDataType().equals(DataTypeConsist.DATE.toString())){
-					colModelTemplate = JavaCoreParam.JQGRID_COL_MODEL_DATE;
+					colModelTemplate = StableCharConsist.JQGRID_COL_MODEL_DATE;
 				}else if(field.getDataType().equals(DataTypeConsist.BOOLEAN.toString())){
-					colModelTemplate = JavaCoreParam.JQGRID_COL_MODEL_BOOLEAN;
+					colModelTemplate = StableCharConsist.JQGRID_COL_MODEL_BOOLEAN;
 				}else{
-					colModelTemplate = JavaCoreParam.JQGRID_COL_MODEL_COMMON;
+					colModelTemplate = StableCharConsist.JQGRID_COL_MODEL_COMMON;
 				}
-				jqGridColModelSb.append(colModelTemplate.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDCODENAME, field.getCodeName()));
+				jqGridColModelSb.append(colModelTemplate.replaceAll(StableCharConsist.PLACEHOLDER_FIELDCODENAME, field.getCodeName()));
 				
 				
 				if(field.getDataType().equals(DataTypeConsist.DATE.toString())){
-					dateFieldToDateSb.append(JavaCoreParam.DATE_FIELDS_TO_DATE_TEMPLATE.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDNAME, field.getCodeName()));
-					dateFieldsToStrSb.append(JavaCoreParam.DATE_FIELDS_TO_STR_TEMPLATE.replaceAll(InputTypeConsist.PLACEHOLDER_FIELDNAME, field.getCodeName()));
+					dateFieldToDateSb.append(StableCharConsist.DATE_FIELDS_TO_DATE_TEMPLATE.replaceAll(StableCharConsist.PLACEHOLDER_FIELDNAME, field.getCodeName()));
+					dateFieldsToStrSb.append(StableCharConsist.DATE_FIELDS_TO_STR_TEMPLATE.replaceAll(StableCharConsist.PLACEHOLDER_FIELDNAME, field.getCodeName()));
 				}
 				
 				if(!field.getCodeName().equals("createDate")){
@@ -522,12 +522,12 @@ public enum CodeGenerationPolicy {
 					}
 				}
 				
-				fieldRulesSb.append(JavaCoreParam.getTabString(5) + field.getCodeName() + ":[\n");
+				fieldRulesSb.append(SystemConsist.getTabString(5) + field.getCodeName() + ":[\n");
 				List<FieldValidateRule> validateRules = field.getValidateRules();
 				for (int j = 0; j < validateRules.size(); j++) {
 					FieldValidateRule r = validateRules.get(j);
 					if(r.getValidateType().equals("required")){
-						fieldRulesSb.append(JavaCoreParam.getTabString(6) + "{ required: '" + r.getvValue() + "', message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n");
+						fieldRulesSb.append(SystemConsist.getTabString(6) + "{ required: '" + r.getvValue() + "', message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n");
 					}else if(r.getValidateType().equals("range")){
 						String min = "";
 						String max = "";
@@ -546,21 +546,21 @@ public enum CodeGenerationPolicy {
 						String rangeValidateType = "string";
 						if(field.getDataType().equals(DataTypeConsist.INTEGER.toString()))
 							rangeValidateType = "number";
-						String t = JavaCoreParam.getTabString(6) + "{ #min##max# type:'" + rangeValidateType + "',message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n";
+						String t = SystemConsist.getTabString(6) + "{ #min##max# type:'" + rangeValidateType + "',message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n";
 						fieldRulesSb.append(t.replaceAll("#min#", min).replaceAll("#max#", max));
 					}else if(r.getValidateType().equals("length")){
-						fieldRulesSb.append(JavaCoreParam.getTabString(6) + "{ len:" + r.getvValue() + ", message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n");
+						fieldRulesSb.append(SystemConsist.getTabString(6) + "{ len:" + r.getvValue() + ", message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n");
 					}else{
-						fieldRulesSb.append(JavaCoreParam.getTabString(6) + "{ type: '" + r.getValidateType() + "', message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n");
+						fieldRulesSb.append(SystemConsist.getTabString(6) + "{ type: '" + r.getValidateType() + "', message: '" + r.getErrorMsg() + "', trigger: '" + r.getValidateTrigger() + "' },\n");
 					}
 					if(j == validateRules.size() - 1){
 						fieldRulesSb = new StringBuffer(fieldRulesSb.substring(0, fieldRulesSb.length() - 2) + "\n");
 					}
 				}
-				fieldRulesSb.append(JavaCoreParam.getTabString(5) + "],\n");
+				fieldRulesSb.append(SystemConsist.getTabString(5) + "],\n");
 			}
-			jqGridColModelSb.append(JavaCoreParam.JQGRID_COL_MODEL_END);
-			jqGridColNamesSb.append(JavaCoreParam.JQGRID_COL_NAMES_END);
+			jqGridColModelSb.append(StableCharConsist.JQGRID_COL_MODEL_END);
+			jqGridColNamesSb.append(StableCharConsist.JQGRID_COL_NAMES_END);
 			String dateFieldToDate = dateFieldToDateSb.toString();
 			String dateFieldToStr = dateFieldsToStrSb.toString();
 			String jqgridColNames = jqGridColNamesSb.toString();
@@ -568,14 +568,14 @@ public enum CodeGenerationPolicy {
 			String formFieldsJson = formFieldsJsonSb.substring(0, formFieldsJsonSb.length() - 1) + "}";
 			String fieldRules = fieldRulesSb.substring(0, fieldRulesSb.length() - 2).toString() + "\n";
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
-				value = value.replaceAll(JavaCoreParam.DOMAIN_NAME, d.getDomainCodeName());
-				value = value.replaceAll(JavaCoreParam.TABLE_NAME, d.getTableName());
-				value = value.replaceAll(JavaCoreParam.FORM_FIELDS_JSON, formFieldsJson);
-				value = value.replaceAll(JavaCoreParam.VALIDATE_RULES, fieldRules);
-				value = value.replaceAll(JavaCoreParam.DATE_FIELDS_TO_DATE, dateFieldToDate);
-				value = value.replaceAll(JavaCoreParam.DATE_FIELDS_TO_STR, dateFieldToStr);
-				value = value.replaceAll(JavaCoreParam.JQGRID_COL_NAMES, jqgridColNames);
-				value = value.replaceAll(JavaCoreParam.JQGRID_COL_MODEL, jqGridColModel);
+				value = value.replaceAll(StableCharConsist.DOMAIN_NAME, d.getDomainCodeName());
+				value = value.replaceAll(StableCharConsist.TABLE_NAME, d.getTableName());
+				value = value.replaceAll(StableCharConsist.FORM_FIELDS_JSON, formFieldsJson);
+				value = value.replaceAll(StableCharConsist.VALIDATE_RULES, fieldRules);
+				value = value.replaceAll(StableCharConsist.DATE_FIELDS_TO_DATE, dateFieldToDate);
+				value = value.replaceAll(StableCharConsist.DATE_FIELDS_TO_STR, dateFieldToStr);
+				value = value.replaceAll(StableCharConsist.JQGRID_COL_NAMES, jqgridColNames);
+				value = value.replaceAll(StableCharConsist.JQGRID_COL_MODEL, jqGridColModel);
 				return value;
 			});
 		}

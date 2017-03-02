@@ -20,7 +20,7 @@ import org.apel.gaia.commons.jqgrid.QueryParams;
 import org.apel.gaia.commons.pager.PageBean;
 import org.apel.gaia.util.ExportUtil;
 import org.apel.gaia.util.jqgrid.JqGridUtil;
-import org.apel.hera.biz.consist.FileConsist;
+import org.apel.hera.biz.consist.SystemConsist;
 import org.apel.hera.biz.domain.Project;
 import org.apel.hera.biz.service.ProjectService;
 import org.apel.poseidon.security.plug.license.License;
@@ -124,13 +124,13 @@ public class ProjectController {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		return ExportUtil.getResponseEntityByFile(newBytes, FileConsist.LICENSE_NAME);
+		return ExportUtil.getResponseEntityByFile(newBytes, SystemConsist.LICENSE_NAME);
 	}
 	
 	//工程脚手架下载
 	@RequestMapping(value = "/downloadProjectScaffold", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<byte[]> downloadProjectScaffold(String projectId){
-		return ExportUtil.getResponseEntityByFile(projectService.generateProjectScaffold(projectId), FileConsist.threadExportName.get());
+		return ExportUtil.getResponseEntityByFile(projectService.generateProjectScaffold(projectId), SystemConsist.threadExportName.get());
 	}
 	
 	//实体代码下载

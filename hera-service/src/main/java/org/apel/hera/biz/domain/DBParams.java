@@ -1,10 +1,7 @@
 package org.apel.hera.biz.domain;
 
-public class DBParams {
+public class DBParams  extends TemplateParam{
 
-	public static final String CONNECTION_CONFIG = "#connection_config#";
-	public static final String DRUID_CONFIG = "#druid_config#";
-	
 	private String url;
 	private String driverClass;
 	private String username;

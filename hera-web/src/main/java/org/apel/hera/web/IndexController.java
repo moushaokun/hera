@@ -1,7 +1,7 @@
 package org.apel.hera.web;
 
 import org.apel.gaia.util.ExportUtil;
-import org.apel.hera.biz.consist.FileConsist;
+import org.apel.hera.biz.consist.SystemConsist;
 import org.apel.hera.biz.domain.DBParams;
 import org.apel.hera.biz.domain.SettingsConfigParam;
 import org.apel.hera.biz.service.CodeGenerationPolicy;
@@ -26,7 +26,7 @@ public class IndexController {
 	@RequestMapping(value = "/downloadBootConfig", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<byte[]> downloadBootConfig(){
 		byte[] bytes = CodeGenerationPolicy.BOOT_CONFIG.generateSourceCode(null);
-		return ExportUtil.getResponseEntityByFile(bytes, FileConsist.BOOT_FILE_NAME);
+		return ExportUtil.getResponseEntityByFile(bytes, SystemConsist.BOOT_FILE_NAME);
 	}
 	
 	/**
@@ -35,7 +35,7 @@ public class IndexController {
 	@RequestMapping(value = "/downloadMvnSettings", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<byte[]> downloadMvnSettings(SettingsConfigParam settingsConfigParam){
 		byte[] bytes = CodeGenerationPolicy.SETTINGS_TEMPLATE.generateSourceCode(settingsConfigParam);
-		return ExportUtil.getResponseEntityByFile(bytes, FileConsist.SETTINGS_FILE_NAME);
+		return ExportUtil.getResponseEntityByFile(bytes, SystemConsist.SETTINGS_FILE_NAME);
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class IndexController {
 	@RequestMapping(value = "/downloadDBConfig", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<byte[]> downloadDBConfig(DBParams dbParams){
 		byte[] bytes = CodeGenerationPolicy.DB_CONFIG.generateSourceCode(dbParams);
-		return ExportUtil.getResponseEntityByFile(bytes, FileConsist.DB_FILE_NAME);
+		return ExportUtil.getResponseEntityByFile(bytes, SystemConsist.DB_FILE_NAME);
 	}
 	
 	/**
@@ -53,7 +53,7 @@ public class IndexController {
 	@RequestMapping(value = "/downloadConsoleZip", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<byte[]> downloadConsoleZip(String packageName){
 		byte[] bytes = CodeGenerationPolicy.CONSOLE_SKETCH.generateSourceCode(packageName);
-		return ExportUtil.getResponseEntityByFile(bytes, FileConsist.threadExportName.get());
+		return ExportUtil.getResponseEntityByFile(bytes, SystemConsist.threadExportName.get());
 	}
 	
 	

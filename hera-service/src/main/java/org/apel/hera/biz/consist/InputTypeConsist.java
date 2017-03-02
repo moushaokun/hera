@@ -53,18 +53,6 @@ public enum InputTypeConsist {
 	
 	private String name;
 	
-	public static final String html_COL_TEMPLATE = "\t\t\t\t\t<el-col :span=\"#span#\">\n\t\t\t\t\t\t<el-form-item label=\"#fieldName#\" prop=\"#fieldCodeName#\">\n#formInput#\t\t\t\t\t\t</el-form-item>\n\t\t\t\t\t</el-col>\n";
-	public static final String PLACEHOLDER_FORMINPUT = "#formInput#";
-	public static final String PLACEHOLDER_SPAN = "#span#";
-	public static final String PLACEHOLDER_FIELDNAME = "#fieldName#";
-	public static final String PLACEHOLDER_FIELDCODENAME = "#fieldCodeName#";
-	
-	public static final String HTML_ROW_START_TEMPLATE = "\t\t\t\t<el-row>\n";
-	public static final String HTML_ROW_END_TEMPLATE = "\t\t\t\t</el-row>\n";
-	
-	public static final String HTML_EMPTY_COL_TEMPLATE = "\t\t\t\t\t<el-col :span=\"#span#\"></el-col>\n";
-	public static final String HTML_SEARCH_OPTION_TEMPLATE = "\t\t\t\t\t\t\t\t<el-option label=\"#fieldName#\" value=\"#fieldCodeName#\"></el-option>\n";
-	
 	private InputTypeConsist(String name){
 		this.name = name;
 	}
