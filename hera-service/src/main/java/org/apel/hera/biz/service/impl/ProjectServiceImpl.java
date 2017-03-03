@@ -109,6 +109,9 @@ public class ProjectServiceImpl extends AbstractBizCommonService<Project, String
 		String tempKey = UUIDUtil.uuid();
 		String exportRootPath = System.getProperty("user.dir") + "/tmp/" + tempKey;
 		File tempDir = new File(System.getProperty("user.dir") + "/tmp/" + tempKey);
+		if(!tempDir.exists()){
+			tempDir.mkdirs();
+		}
 		String zipPath = System.getProperty("user.dir") + "/tmp/" + tempKey + ".zip";
 		List<Domain> domains = domainService.findByProjectId(projectId);
 		for (Domain domain : domains) {

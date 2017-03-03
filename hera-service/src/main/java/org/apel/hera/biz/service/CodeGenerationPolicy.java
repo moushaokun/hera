@@ -565,8 +565,8 @@ public enum CodeGenerationPolicy {
 			String dateFieldToStr = dateFieldsToStrSb.toString();
 			String jqgridColNames = jqGridColNamesSb.toString();
 			String jqGridColModel= jqGridColModelSb.toString();
-			String formFieldsJson = formFieldsJsonSb.substring(0, formFieldsJsonSb.length() - 1) + "}";
-			String fieldRules = fieldRulesSb.substring(0, fieldRulesSb.length() - 2).toString() + "\n";
+			String formFieldsJson = formFieldsJsonSb.toString().equals("{") ? "{}" : formFieldsJsonSb.substring(0, formFieldsJsonSb.length() - 1) + "}";
+			String fieldRules = StringUtils.isEmpty(fieldRulesSb.toString()) ? "" : fieldRulesSb.substring(0, fieldRulesSb.length() - 2).toString() + "\n";
 			return CodeIOUtil.generateSourceBytes(toString(), value -> {
 				value = value.replaceAll(StableCharConsist.DOMAIN_NAME, d.getDomainCodeName());
 				value = value.replaceAll(StableCharConsist.TABLE_NAME, d.getTableName());
