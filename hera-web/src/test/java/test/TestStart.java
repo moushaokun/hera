@@ -1,11 +1,11 @@
 package test;
 
-import org.apel.gaia.container.boot.SimplePlatformStarter;
+import org.apel.gaia.container.boot.PlatformStarter;
 
 public class TestStart {
 	
 	public static void main(String[] args) {
-		SimplePlatformStarter.start(args);
+		PlatformStarter.start(args);
 	}
 	
 }
