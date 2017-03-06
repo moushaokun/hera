@@ -2,6 +2,7 @@ var vue;
 var middleBarShow = false;
 var treeData;
 var subMenus = [];
+var casIndexUrl;
 
 $(function(){
 	
@@ -77,6 +78,14 @@ $(function(){
 					this.tabItems[this.tabItems.length - 1].selected = true;
 				}
 			}
+		}
+	});
+	
+	//获取casIndexUrl
+	PlatformUI.ajax({
+		url: contextPath + "/getCasIndexUrl",
+		afterOperation: function(data){
+			casIndexUrl = data.responseText; 
 		}
 	});
 	

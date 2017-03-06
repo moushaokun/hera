@@ -16,6 +16,7 @@ import org.apel.poseidon.api.SystemUserService;
 import org.apel.poseidon.api.domain.SystemMenu;
 import org.apel.poseidon.api.domain.SystemUser;
 import org.apel.poseidon.security.commons.util.UserDetailsUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,8 @@ public class UIIndexController {
 	private SystemUserService systemUserProvider;
 	@Reference
 	private CasService casProvider;
+	@Value("${cas_server_url}")
+	private String casIndexUrl;
 	
 	@RequestMapping
 	public String index() throws Exception{
@@ -106,5 +109,10 @@ public class UIIndexController {
 		return result;
 	} 
 	
+	//获取cas index url
+	@RequestMapping(value="getCasIndexUrl")
+	public @ResponseBody String getCasIndexUrl() throws Exception{
+		return casIndexUrl;
+	}
 	
 }
