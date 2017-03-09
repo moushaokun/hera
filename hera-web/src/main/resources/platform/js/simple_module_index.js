@@ -195,6 +195,7 @@ $(function(){
         			if (valid) {
         				var data = $.extend({}, context.form);
         				data['project.id'] = data.projectId;
+        				delete data.rowCols;
         				var actionUrl = contextPath + "/simpleModule";
         				if(context.formEdit){
         					actionUrl = contextPath + "/simpleModule/" + data.id;
