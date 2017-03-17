@@ -5,8 +5,6 @@ import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
 import io.protostuff.runtime.RuntimeSchema;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -117,7 +115,7 @@ public class ProjectController {
 		Schema<License> schema = RuntimeSchema.getSchema(License.class);
 		byte[] bytes = ProtostuffIOUtil.toByteArray(license, schema, LinkedBuffer.allocate());
 		byte[] newBytes = null;
-		try(FileOutputStream fos = new FileOutputStream(new File("d:/v.license"));){
+		try{
 			newBytes = Arrays.copyOf(bytes, bytes.length + 1);
 			newBytes[bytes.length] = 1;
 		} catch (Exception e) {
