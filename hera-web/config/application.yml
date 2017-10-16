@@ -1,0 +1,12 @@
+server:
+  port: 8082
+  context-path: /hera
+
+dubbo: 
+  zookeeper-address: localhost:2181
+  application: 
+    name: hera
+    
+
+appId: hera
+cas_server_url: http://localhost:8080/cas
