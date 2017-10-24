@@ -199,33 +199,17 @@ public enum CodeGenerationPolicy {
 		public byte[] generateSourceCode(Object templateParam) {
 			ProjectParam projectParam = (ProjectParam)templateParam;
 			Project project = projectParam.getProject();
-			CodeIOUtil.generateSourceFile(toString(), value -> {
-				value = value.replaceAll(StableCharConsist.WEB_PORT, project.getWebPort());
-				value = value.replaceAll(StableCharConsist.CONTEXT_PATH, "/" + project.getContextPath());
-				return value;
-			}, projectParam.getPath(), SystemConsist.PROJECT_APPLICATION_PROPERTIES);
-			return null;
-		}
-		
-	},
-	/**
-	 * 工程的center properties
-	 */
-	PROJECT_CENTER_PROPERTIES(SystemConsist.PROJECT_CENTER_PROPERTIES_TEMPLATE){
-
-		@Override
-		public byte[] generateSourceCode(Object templateParam) {
-			ProjectParam projectParam = (ProjectParam)templateParam;
-			Project project = projectParam.getProject();
 			String appId = StringUtils.isEmpty(project.getAppId()) ? "" : project.getAppId();
 			String casUrl = StringUtils.isEmpty(project.getCasUrl()) ? "" : project.getCasUrl();
 			String zkUrl = StringUtils.isEmpty(project.getZookeeperUrl()) ? "" : project.getZookeeperUrl();
 			CodeIOUtil.generateSourceFile(toString(), value -> {
+				value = value.replaceAll(StableCharConsist.WEB_PORT, project.getWebPort());
+				value = value.replaceAll(StableCharConsist.CONTEXT_PATH, "/" + project.getContextPath());
 				value = value.replaceAll(StableCharConsist.APP_ID, appId);
 				value = value.replaceAll(StableCharConsist.CAS_URL, casUrl);
 				value = value.replaceAll(StableCharConsist.ZK_URL, zkUrl);
 				return value;
-			}, projectParam.getPath(), SystemConsist.PROJECT_CENTER_PROPERTIES);
+			}, projectParam.getPath(), SystemConsist.PROJECT_APPLICATION_PROPERTIES);
 			return null;
 		}
 		

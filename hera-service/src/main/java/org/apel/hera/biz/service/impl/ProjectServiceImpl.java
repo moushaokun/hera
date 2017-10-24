@@ -64,10 +64,8 @@ public class ProjectServiceImpl extends AbstractBizCommonService<Project, String
 			//产生pom.xml
 			projectParam.setPath(exportProjectDir.getPath());
 			CodeGenerationPolicy.PROJECT_POM.generateSourceCode(projectParam);
-			//产生center.properties
-			projectParam.setPath(exportProjectDir.getPath() + "/config");
-			CodeGenerationPolicy.PROJECT_CENTER_PROPERTIES.generateSourceCode(projectParam);
 			//产生application.properties
+			projectParam.setPath(exportProjectDir.getPath() + "/config");
 			CodeGenerationPolicy.PROJECT_APPLICATION_PROPERTIES.generateSourceCode(projectParam);
 			//产生spring module-*.xml
 			projectParam.setPath(exportProjectDir.getPath() + "/src/main/resources/META-INF/spring");

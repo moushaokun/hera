@@ -3,10 +3,10 @@ server:
   context-path: /hera
 
 dubbo: 
-  zookeeper-address: localhost:2181
+  zookeeper-address: 192.168.0.158:2181
   application: 
     name: hera
     
 
 appId: hera
-cas_server_url: http://localhost:8080/cas
+cas_server_url: http://192.168.0.158:8080/cas
